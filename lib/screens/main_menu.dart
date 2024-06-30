@@ -109,7 +109,6 @@ class _MainMenuState extends State<MainMenu> {
                                 Navigator.of(context).push(MaterialPageRoute(builder: (context) => const AiCompose(),),);
                               },
                               child: Container(
-                                width: screenWidth,
                                 decoration: gbBox(0.8),
                                 child: Padding(
                                   padding: const EdgeInsets.all(30.0),

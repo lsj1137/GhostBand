@@ -27,6 +27,7 @@ flutter:
   assets:
     - assets/images/
     - assets/images/instruments/
+    - assets/images/genre/
 
   fonts:
     - family: Pretendard

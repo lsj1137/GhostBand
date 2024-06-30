@@ -12,6 +12,21 @@ class AiCompose extends StatefulWidget {
 
 class _AiComposeState extends State<AiCompose> {
   bool composeReady = false;
+  late List<double> containerHeight = [MediaQuery.of(context).size.height*0.45, 0, 0];
+  int currentQuestion = 0;
+
+  void _expandContainer (int i) {
+    setState(() {
+      currentQuestion = i;
+      for (var j=0; j<containerHeight.length; j++) {
+        if (j==i) {
+          containerHeight[j] = MediaQuery.of(context).size.height*0.45;
+        } else {
+          containerHeight[j] = 0;
+        }
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +58,7 @@ class _AiComposeState extends State<AiCompose> {
                   child: Container(
                     decoration: gbBox(1),
                     child: Padding(
-                      padding: const EdgeInsets.all(25.0),
+                      padding: const EdgeInsets.only(top: 25.0, left: 25, right: 25.0),
                       child: Column(
                         children: [
                           Row(
@@ -75,7 +90,146 @@ class _AiComposeState extends State<AiCompose> {
                               )
                             ],
                           ),
-
+                          SizedBox(height: 15,),
+                          // 1번 질문
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10.0),
+                            child: InkWell(
+                              onTap: (){
+                                _expandContainer(0);
+                              },
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: screenHeight*0.05,
+                                    height: screenHeight*0.05,
+                                    decoration: questionNum(),
+                                    child: Align(
+                                      alignment: Alignment.center,
+                                        child: Text("1", style: semiBold(20),)
+                                    ),
+                                  ),
+                                  SizedBox(width: 15,),
+                                  Text("어떤 장르의 곡을 원하시나요?", style: semiBold(20),)
+                                ],
+                              ),
+                            ),
+                          ),
+                          // 1번 질문 내용
+                          AnimatedContainer(
+                            duration: Duration(milliseconds: 200),
+                            height: containerHeight[0],
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 10.0),
+                              child: Row(
+                                children: [
+                                  SizedBox(width: screenHeight*0.025,),
+                                  VerticalDivider(width: 0,color: Colors.black,thickness: 2,),
+                                  SizedBox(width: screenHeight*0.025+10,),
+                                  Visibility(
+                                    visible: currentQuestion==0,
+                                    child: Expanded(
+                                      child: ListView(
+                                        scrollDirection: Axis.horizontal,
+                                        children: [
+                                          InkWell(
+                                            onTap: (){},
+                                            child: Image.asset("assets/images/genre/rock.png",width: screenWidth*0.2,),
+                                          ),
+                                          InkWell(
+                                            onTap: (){},
+                                            child: Image.asset("assets/images/genre/hiphop.png",width: screenWidth*0.2,),
+                                          ),
+                                          InkWell(
+                                            onTap: (){},
+                                            child: Image.asset("assets/images/genre/jazz.png",width: screenWidth*0.2,),
+                                          ),
+                                          InkWell(
+                                            onTap: (){},
+                                            child: Image.asset("assets/images/genre/rnb.png",width: screenWidth*0.2,),
+                                          ),
+                                          InkWell(
+                                            onTap: (){},
+                                            child: Image.asset("assets/images/genre/reggae.png",width: screenWidth*0.2,),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          // 2번 질문
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10.0),
+                            child: InkWell(
+                              onTap: (){
+                                _expandContainer(1);
+                              },
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: screenHeight*0.05,
+                                    height: screenHeight*0.05,
+                                    decoration: questionNum(),
+                                    child: Align(
+                                        alignment: Alignment.center,
+                                        child: Text("2", style: semiBold(20),)
+                                    ),
+                                  ),
+                                  SizedBox(width: 15,),
+                                  Text("어떤 리듬을 원하시나요? (박자, BPM)", style: semiBold(20),)
+                                ],
+                              ),
+                            ),
+                          ),
+                          // 2번 질문 내용
+                          AnimatedContainer(
+                            duration: Duration(milliseconds: 200),
+                            height: containerHeight[1],
+                            child: Row(
+                              children: [
+                                SizedBox(width: screenHeight*0.025,),
+                                VerticalDivider(width: 0,color: Colors.black,thickness: 2,)
+                              ],
+                            ),
+                          ),
+                          // 3번 질문
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10.0),
+                            child: InkWell(
+                              onTap: (){
+                                _expandContainer(2);
+                              },
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: screenHeight*0.05,
+                                    height: screenHeight*0.05,
+                                    decoration: questionNum(),
+                                    child: Align(
+                                        alignment: Alignment.center,
+                                        child: Text("3", style: semiBold(20),)
+                                    ),
+                                  ),
+                                  SizedBox(width: 15,),
+                                  Text("어떤 악기로 만들까요?", style: semiBold(20),)
+                                ],
+                              ),
+                            ),
+                          ),
+                          // 3번 질문 내용
+                          AnimatedContainer(
+                            duration: Duration(milliseconds: 200),
+                            height: containerHeight[2],
+                            child: Row(
+                              children: [
+                                SizedBox(width: screenHeight*0.025,),
+                                VerticalDivider(width: 0,color: Colors.black,thickness: 2,)
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     ),

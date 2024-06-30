@@ -11,6 +11,17 @@ BoxDecoration gbBox (double opacity) {
   );
 }
 
+BoxDecoration questionNum () {
+  return BoxDecoration(
+      color: const Color(0xFFFFFFFF),
+      borderRadius: const BorderRadius.all(Radius.circular(50.0)),
+      border: Border.all(
+          color: const Color(0xFF000000),
+          width: 2
+      )
+  );
+}
+
 TextStyle semiBold (double size) {
   return TextStyle(
     fontSize: size,
