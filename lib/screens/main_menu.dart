@@ -81,11 +81,11 @@ class _MainMenuState extends State<MainMenu> {
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 18.0),
+                padding: EdgeInsets.symmetric(vertical: titlePaddingSize(screenWidth)),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("Ghost Band",style: semiBold(40),),
+                    Text("Ghost Band",style: semiBold(fontSize1(screenWidth)),),
                     InkWell(
                       onTap: (){
                         _scaffoldKey.currentState?.openEndDrawer();
@@ -111,11 +111,11 @@ class _MainMenuState extends State<MainMenu> {
                               child: Container(
                                 decoration: gbBox(0.8),
                                 child: Padding(
-                                  padding: const EdgeInsets.all(30.0),
+                                  padding: EdgeInsets.all(menuPaddingSize(screenWidth)),
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text("AI 작곡", style: semiBold(30),),
+                                      Text("AI 작곡", style: semiBold(fontSize2(screenWidth)),),
                                       Expanded(
                                         child: Align(
                                           alignment: Alignment.center,
@@ -155,14 +155,14 @@ class _MainMenuState extends State<MainMenu> {
                                             )
                                         ),
                                       ),
-                                      Text("AI를 활용해 작곡하고 악보를 제공합니다.\n특정 악기의 곡만 생성하는 것도 가능합니다.", style: semiBold(20))
+                                      Text("AI를 활용해 작곡하고 악보를 제공합니다.\n특정 악기의 곡만 생성하는 것도 가능합니다.", style: semiBold(fontSize3(screenWidth)))
                                     ],
                                   ),
                                 ),
                               ),
                             ),
                           ),
-                          SizedBox(height: 15,),
+                          SizedBox(height: menuGap(screenWidth),),
                           Expanded(
                             flex: 71,
                             child: InkWell(
@@ -170,28 +170,28 @@ class _MainMenuState extends State<MainMenu> {
                               child: Container(
                                 decoration: gbBox(0.8),
                                 child: Padding(
-                                  padding: const EdgeInsets.all(30.0),
+                                  padding: EdgeInsets.all(menuPaddingSize(screenWidth)),
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text("악보 확인/재생", style: semiBold(30),),
+                                      Text("악보 확인/재생", style: semiBold(fontSize2(screenWidth)),),
                                       Expanded(
                                         child: Align(
                                             alignment: Alignment.center,
                                             child: Image.asset("assets/images/play_score.png",height: screenHeight*0.12,)),
                                       ),
-                                      Text("지금까지 만들어진 모든 악보를 확인/재생합니다.", style: semiBold(20))
+                                      Text("지금까지 만들어진 모든 악보를 확인/재생합니다.", style: semiBold(fontSize3(screenWidth)))
                                     ],
                                   ),
                                 ),
                               ),
                             ),
                           ),
-                          SizedBox(height: 18,),
+                          SizedBox(height: menuGap(screenWidth),),
                         ],
                       ),
                     ),
-                    SizedBox(width: 15,),
+                    SizedBox(width: menuGap(screenWidth),),
                     Expanded(
                         flex: 1,
                         child: Column(
@@ -204,24 +204,24 @@ class _MainMenuState extends State<MainMenu> {
                                   width: screenWidth,
                                   decoration: gbBox(0.8),
                                   child: Padding(
-                                    padding: const EdgeInsets.all(30.0),
+                                    padding: EdgeInsets.all(menuPaddingSize(screenWidth)),
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text("악보 추출", style: semiBold(30),),
+                                        Text("악보 추출", style: semiBold(fontSize2(screenWidth)),),
                                         Expanded(
                                           child: Align(
                                               alignment: Alignment.center,
                                               child: Image.asset("assets/images/adc_convert.png",height: screenHeight*0.12,)),
                                         ),
-                                        Text("음원에서 악보를 추출합니다.", style: semiBold(20))
+                                        Text("음원에서 악보를 추출합니다.", style: semiBold(fontSize3(screenWidth)))
                                       ],
                                     ),
                                   ),
                                 ),
                               ),
                             ),
-                            SizedBox(height: 15,),
+                            SizedBox(height: menuGap(screenWidth),),
                             Expanded(
                               flex: 100,
                               child: InkWell(
@@ -229,11 +229,11 @@ class _MainMenuState extends State<MainMenu> {
                                 child: Container(
                                   decoration: gbBox(0.8),
                                   child: Padding(
-                                    padding: const EdgeInsets.all(30.0),
+                                    padding: EdgeInsets.all(menuPaddingSize(screenWidth)),
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text("악기 소리 뮤트", style: semiBold(30),),
+                                        Text("악기 소리 뮤트", style: semiBold(fontSize2(screenWidth)),),
                                         Expanded(
                                           child: Row(
                                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -256,14 +256,14 @@ class _MainMenuState extends State<MainMenu> {
                                             ],
                                           ),
                                         ),
-                                        Text("음원에서 특정 악기의 소리를 뮤트시킵니다.", style: semiBold(20))
+                                        Text("음원에서 특정 악기의 소리를 뮤트시킵니다.", style: semiBold(fontSize3(screenWidth)))
                                       ],
                                     ),
                                   ),
                                 ),
                               ),
                             ),
-                            SizedBox(height: 18,),
+                            SizedBox(height: menuGap(screenWidth),),
                           ],
                         ),
                     )

@@ -7,6 +7,7 @@ class MainDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
     return Drawer(
       backgroundColor: Colors.white,
       shape: LinearBorder.none,
@@ -19,7 +20,7 @@ class MainDrawer extends StatelessWidget {
             child: ListTile(
               onTap: () { },
               leading: Image.asset("assets/images/setting.png", width: 30,),
-              title: Text('설정', style: semiBold(20),),
+              title: Text('설정', style: semiBold(fontSize2(screenWidth)),),
             ),
           ),
           Divider(height: 2,color: Color(0xff848484),thickness: 1.5,indent: 15,endIndent: 15,),
@@ -28,7 +29,7 @@ class MainDrawer extends StatelessWidget {
             child: ListTile(
               onTap: () { },
               leading: Image.asset("assets/images/help.png", width: 30,),
-              title: Text('도움말', style: semiBold(20),),
+              title: Text('도움말', style: semiBold(fontSize2(screenWidth)),),
             ),
           ),
           Divider(height: 2,color: Color(0xff848484),thickness: 1.5,indent: 15,endIndent: 15,),
@@ -37,7 +38,7 @@ class MainDrawer extends StatelessWidget {
             child: ListTile(
               onTap: () { },
               leading: Image.asset("assets/images/info.png", width: 30,),
-              title: Text('정보', style: semiBold(20),),
+              title: Text('정보', style: semiBold(fontSize2(screenWidth)),),
             ),
           ),
           Divider(height: 2,color: Color(0xff848484),thickness: 1.5,indent: 15,endIndent: 15,),
