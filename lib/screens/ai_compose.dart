@@ -1,5 +1,9 @@
-import 'package:flutter/cupertino.dart';
+// TODO: 서버로 어트리뷰트 전송
+
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:ghost_band/config/attribute_controller.dart';
+import 'package:ghost_band/screens/compose_ing.dart';
 
 import '../config/gb_theme.dart';
 
@@ -11,6 +15,8 @@ class AiCompose extends StatefulWidget {
 }
 
 class _AiComposeState extends State<AiCompose> {
+  final AttributeController attributeController = Get.put(AttributeController());
+
   bool composeReady = false;
   late List<double> containerHeight = [MediaQuery.of(context).size.height*0.45, 0, 0];
   int currentQuestion = 0;
@@ -18,6 +24,7 @@ class _AiComposeState extends State<AiCompose> {
   List<String> rhythm = ["디스코(DISCO)","고고(GOGO)", "슬로고고(Slow GOGO)", "스윙(SWING)", "락(ROCK)", "슬로락(Slow ROCK)", "탱고(TANGO)", "차차(CHACHA)", "왈츠(WALTZ)", "트롯(TROT)"];
   List<String> instruments = ["guitar", "bass_guitar", "keyboard", "drum", "synth", "classic_guitar", "piano", "trumpet", "sax", "violin", "cello", "organ"];
   List<String> kInstName = ["일렉 기타", "베이스 기타", "키보드", "드럼", "신디사이저", "클래식 기타", "피아노", "트럼펫", "색소폰", "바이올린", "첼로", "오르간"];
+  List<String> kGenreName = ["락(Rock)", "힙합(Hiphop)", "재즈(Jazz)", "알앤비(Rnb)", "래게(Reggae)"];
 
   int selectedGenre = -1;
   String selectedGenreString = "";
@@ -49,10 +56,10 @@ class _AiComposeState extends State<AiCompose> {
   }
 
   void _selectGenre (int i) {
-    List<String> genreKorean = ["락(Rock)", "힙합(Hiphop)", "재즈(Jazz)", "알앤비(Rnb)", "래게(Reggae)"];
     setState(() {
       selectedGenre = i;
-      selectedGenreString = "> ${genreKorean[i]}";
+      selectedGenreString = "> ${kGenreName[i]}";
+      attributeController.genre = genre[i];
     });
     isComposeReady();
     Future.delayed(const Duration(milliseconds: 250), (){
@@ -63,12 +70,15 @@ class _AiComposeState extends State<AiCompose> {
   void _selectRhythm (int i) {
     setState(() {
       selectedRhythm = i;
+      attributeController.rhythm = rhythm[i];
       _rhythmController1.text="";
       _rhythmController2.text="";
       _rhythmController3.text="";
       timeSignature1 = 0;
       timeSignature2 = 0;
+      attributeController.signature = "";
       bpm = 0;
+      attributeController.bpm = "";
       bpmSet = false;
       selectedRhythmString = "> ${rhythm[i]}";
     });
@@ -82,8 +92,11 @@ class _AiComposeState extends State<AiCompose> {
     setState(() {
       timeSignature1 = int.parse(_rhythmController1.text);
       timeSignature2 = int.parse(_rhythmController2.text);
+      attributeController.signature = "${timeSignature2} 분에 ${timeSignature1} 박자";
       bpm = int.parse(_rhythmController3.text);
+      attributeController.bpm = "$bpm BPM";
       selectedRhythm = -1;
+      attributeController.rhythm = "";
       selectedRhythmString = "> ${timeSignature2} 분에 ${timeSignature1} 박자 / $bpm BPM";
     });
     if (timeSignature1!=0 && timeSignature2!=0 && bpm!=0) {
@@ -98,6 +111,7 @@ class _AiComposeState extends State<AiCompose> {
   void _selectInst (int i) {
     setState(() {
       selectedInst[i] = !selectedInst[i];
+      attributeController.instruments = selectedInst;
       selectedInstString = "> ";
       for (int j=0; j<selectedInst.length; j++) {
         selectedInstString += selectedInst[j] ? "${kInstName[j]} / " : "";
@@ -170,28 +184,13 @@ class _AiComposeState extends State<AiCompose> {
                                 Text("원하시는 느낌의 새로운 곡을 만들어볼게요!",style: semiBold(fontSize2(screenWidth)),),
                                 InkWell(
                                   onTap: (){
-
+                                    if (composeReady) {
+                                      Navigator.of(context).pushReplacement(
+                                        MaterialPageRoute(builder: (
+                                            context) => const ComposeIng(),),);
+                                    }
                                   },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: composeReady ? Color(0xff0085D0) : Color(0xffB3B3B3)
-                                    ),
-                                    child: Padding(
-                                      padding: EdgeInsets.symmetric(vertical: composeButtonPaddingV(screenWidth),horizontal: composeButtonPaddingH(screenWidth)),
-                                      child: Row(
-                                        children: [
-                                          Image.asset("assets/images/start.png", width: fontSize3(screenWidth),),
-                                          const SizedBox(width: 10,),
-                                          Text("작곡 시작", style: TextStyle(
-                                            fontSize: fontSize3(screenWidth),
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.white),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  ),
+                                  child: startButton(screenWidth, composeReady, "작곡 시작"),
                                 )
                               ],
                             ),
@@ -344,9 +343,9 @@ class _AiComposeState extends State<AiCompose> {
                                                                       width: screenHeight*0.02,
                                                                       height: screenHeight*0.02,
                                                                       decoration: selectedRhythm!=index ? questionNum():
-                                                                        const BoxDecoration(
+                                                                        BoxDecoration(
                                                                             borderRadius: BorderRadius.all(Radius.circular(50.0)),
-                                                                          color: Color(0xff0085D0)
+                                                                          color: gbBlue
                                                                         ),
                                                                     ),
                                                                     const SizedBox(width: 10,),
@@ -474,7 +473,7 @@ class _AiComposeState extends State<AiCompose> {
       notSelected ?
       questionNum() :
       BoxDecoration(
-        color: Color(0xff0085D0),
+        color: gbBlue,
         borderRadius: const BorderRadius.all(Radius.circular(50.0)),
       ),
       child: Align(
@@ -534,9 +533,9 @@ class _AiComposeState extends State<AiCompose> {
                                 width: MediaQuery.of(context).size.height*0.02,
                                 height: MediaQuery.of(context).size.height*0.02,
                                 decoration: !selectedInst[ind*2+startInd] ? questionNum() :
-                                const BoxDecoration(
+                                BoxDecoration(
                                     borderRadius: BorderRadius.all(Radius.circular(50.0)),
-                                    color: Color(0xff0085D0)
+                                    color: gbBlue
                                 ),
                               ),
                             ),

@@ -3,6 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:ghost_band/config/gb_theme.dart';
 import 'package:ghost_band/screens/ai_compose.dart';
+import 'package:ghost_band/screens/check_score.dart';
+import 'package:ghost_band/screens/make_score.dart';
+import 'package:ghost_band/screens/mute_inst.dart';
 import 'package:ghost_band/widgets/main_drawer.dart';
 
 class MainMenu extends StatefulWidget {
@@ -146,11 +149,6 @@ class _MainMenuState extends State<MainMenu> {
                                                       duration: const Duration(milliseconds: 900),
                                                       child: Image.asset("assets/images/compose04.png",height: screenHeight*0.15,)
                                                   ),
-                                                  // AnimatedOpacity(
-                                                  //     opacity: _noteOpacities[3],
-                                                  //     duration: const Duration(milliseconds: 900),
-                                                  //     child: Image.asset("assets/images/compose.png",height: screenHeight*0.15,)
-                                                  // ),
                                                 ]
                                             )
                                         ),
@@ -166,7 +164,9 @@ class _MainMenuState extends State<MainMenu> {
                           Expanded(
                             flex: 71,
                             child: InkWell(
-                              onTap: (){},
+                              onTap: (){
+                                Navigator.of(context).push(MaterialPageRoute(builder: (context) => const CheckScore(),),);
+                              },
                               child: Container(
                                 decoration: gbBox(0.8),
                                 child: Padding(
@@ -199,7 +199,9 @@ class _MainMenuState extends State<MainMenu> {
                             Expanded(
                               flex: 71,
                               child: InkWell(
-                                onTap: (){},
+                                onTap: (){
+                                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => const MakeScore(),),);
+                                },
                                 child: Container(
                                   width: screenWidth,
                                   decoration: gbBox(0.8),
@@ -225,7 +227,9 @@ class _MainMenuState extends State<MainMenu> {
                             Expanded(
                               flex: 100,
                               child: InkWell(
-                                onTap: (){},
+                                onTap: (){
+                                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => const MuteInst(),),);
+                                },
                                 child: Container(
                                   decoration: gbBox(0.8),
                                   child: Padding(

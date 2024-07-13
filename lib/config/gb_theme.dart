@@ -95,10 +95,10 @@ double composeQuestionGap(double width) {
   }
 }
 
-BoxDecoration gbBox (double opacity) {
+BoxDecoration gbBox (double opacity, {double boxSize = -1}) {
   return BoxDecoration(
     color: const Color(0xFFFFFFFF).withOpacity(opacity),
-    borderRadius: const BorderRadius.all(Radius.circular(30.0)),
+    borderRadius: BorderRadius.all(Radius.circular(boxSize==-1 ? 30.0 : boxSize)),
     border: Border.all(
         color: const Color(0xFFE4E4E4),
         width: 1
@@ -117,9 +117,42 @@ BoxDecoration questionNum () {
   );
 }
 
+Widget startButton (double screenWidth, bool condition, String name) {
+  return Container(
+    decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: condition ? gbBlue : Color(0xffB3B3B3)
+    ),
+    child: Padding(
+      padding: EdgeInsets.symmetric(vertical: composeButtonPaddingV(screenWidth),horizontal: composeButtonPaddingH(screenWidth)),
+      child: Row(
+        children: [
+          Image.asset("assets/images/start.png", width: fontSize3(screenWidth),),
+          const SizedBox(width: 10,),
+          Text(name, style: TextStyle(
+              fontSize: fontSize3(screenWidth),
+              fontWeight: FontWeight.w600,
+              color: Colors.white),
+          )
+        ],
+      ),
+    ),
+  );
+}
+
 TextStyle semiBold (double size) {
   return TextStyle(
     fontSize: size,
     fontWeight: FontWeight.w600,
   );
 }
+
+
+TextStyle normal (double size) {
+  return TextStyle(
+    fontSize: size,
+    fontWeight: FontWeight.w400,
+  );
+}
+
+Color gbBlue = const Color(0xff0085D0);
