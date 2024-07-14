@@ -26,7 +26,7 @@ double fontSize3(double width){
 
 double fontSize4(double width){
   if (width > 1000){
-    return 20;
+    return 16;
   } else {
     return 10;
   }
@@ -139,6 +139,32 @@ Widget startButton (double screenWidth, bool condition, String name) {
     ),
   );
 }
+
+
+// 다이얼로그 디자인 (위쪽)
+BoxDecoration dialogContentDeco = const BoxDecoration(
+  boxShadow: null,
+  border: Border(bottom: BorderSide(
+      color: Color(0xffE4E4E4), width: 1)),
+  borderRadius: BorderRadius.only(
+      topLeft: Radius.circular(20),
+      topRight: Radius.circular(20)),
+  color: Colors.white,
+);
+
+// 다이얼로그 디자인 (왼쪽 아래)
+BoxDecoration dialogActionDeco1 = const BoxDecoration(
+  borderRadius: BorderRadius.only(
+      bottomLeft: Radius.circular(20),),
+  color: Colors.white,
+);
+
+// 다이얼로그 디자인 (오른쪽 아래쪽)
+BoxDecoration dialogActionDeco2 = BoxDecoration(
+  borderRadius: const BorderRadius.only(
+      bottomRight: Radius.circular(20)),
+  color: gbBlue,
+);
 
 TextStyle semiBold (double size) {
   return TextStyle(

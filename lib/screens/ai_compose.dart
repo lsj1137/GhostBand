@@ -1,9 +1,8 @@
-// TODO: 서버로 어트리뷰트 전송
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ghost_band/config/attribute_controller.dart';
 import 'package:ghost_band/screens/compose_ing.dart';
+import 'package:intl/intl.dart';
 
 import '../config/gb_theme.dart';
 
@@ -20,27 +19,25 @@ class _AiComposeState extends State<AiCompose> {
   bool composeReady = false;
   late List<double> containerHeight = [MediaQuery.of(context).size.height*0.45, 0, 0];
   int currentQuestion = 0;
+  List<String> genre2 = ["new_age", "electronic", "rap", "religious", "international", "easy listening", "avant-garde", "RnB", "Latin", "children", "jazz", "classical", "comedy", "pop", "reggae", "stage", "folk", "blues", "vocal", "holiday", "country", "symphony"];
   List<String> genre = ["rock", "hiphop", "jazz", "rnb", "reggae"];
-  List<String> rhythm = ["디스코(DISCO)","고고(GOGO)", "슬로고고(Slow GOGO)", "스윙(SWING)", "락(ROCK)", "슬로락(Slow ROCK)", "탱고(TANGO)", "차차(CHACHA)", "왈츠(WALTZ)", "트롯(TROT)"];
   List<String> instruments = ["guitar", "bass_guitar", "keyboard", "drum", "synth", "classic_guitar", "piano", "trumpet", "sax", "violin", "cello", "organ"];
   List<String> kInstName = ["일렉 기타", "베이스 기타", "키보드", "드럼", "신디사이저", "클래식 기타", "피아노", "트럼펫", "색소폰", "바이올린", "첼로", "오르간"];
   List<String> kGenreName = ["락(Rock)", "힙합(Hiphop)", "재즈(Jazz)", "알앤비(Rnb)", "래게(Reggae)"];
+  List<String> timeSignature = ["4/4", "2/4", "3/4", "1/4", "6/8", "3/8", "other tempos"];
+  List<String> bpms = ["천천히(<=76BPM)", "보통 빠르기로(76-120BPM)", "빠르게(>=120BPM)"];
 
   int selectedGenre = -1;
-  String selectedGenreString = "";
   List<bool> selectedInst = [false, false, false, false, false, false, false, false, false, false, false, false];
+  String selectedGenreString = "";
   String selectedInstString = "";
-  int selectedRhythm = -1;
   String selectedRhythmString = "";
+  int selectedTimeSig = -1;
+  int selectedBpm = -1;
   bool bpmSet = false;
-  int timeSignature1 = 0;
-  int timeSignature2 = 0;
-  int bpm = 0;
+  Map<String, dynamic> sendingData = {};
 
   late ScrollController _scrollController;
-  late TextEditingController _rhythmController1;
-  late TextEditingController _rhythmController2;
-  late TextEditingController _rhythmController3;
 
   void _expandContainer (int i) {
     setState(() {
@@ -67,45 +64,20 @@ class _AiComposeState extends State<AiCompose> {
     });
   }
 
-  void _selectRhythm (int i) {
+  void _setBpm (int i, int j) {
+    if (i==-1 || j==-1) {
+      return;
+    }
     setState(() {
-      selectedRhythm = i;
-      attributeController.rhythm = rhythm[i];
-      _rhythmController1.text="";
-      _rhythmController2.text="";
-      _rhythmController3.text="";
-      timeSignature1 = 0;
-      timeSignature2 = 0;
-      attributeController.signature = "";
-      bpm = 0;
-      attributeController.bpm = "";
-      bpmSet = false;
-      selectedRhythmString = "> ${rhythm[i]}";
+      attributeController.signature = "${timeSignature[i]} 박자";
+      attributeController.bpm = bpms[j];
+      selectedRhythmString = "> ${timeSignature[i]} 박자 | ${bpms[j]}";
     });
+    bpmSet = true;
     isComposeReady();
     Future.delayed(const Duration(milliseconds: 250), (){
-      _expandContainer((currentQuestion+1)%3);
+      _expandContainer((currentQuestion + 1) % 3);
     });
-  }
-
-  void _setBpm () {
-    setState(() {
-      timeSignature1 = int.parse(_rhythmController1.text);
-      timeSignature2 = int.parse(_rhythmController2.text);
-      attributeController.signature = "${timeSignature2} 분에 ${timeSignature1} 박자";
-      bpm = int.parse(_rhythmController3.text);
-      attributeController.bpm = "$bpm BPM";
-      selectedRhythm = -1;
-      attributeController.rhythm = "";
-      selectedRhythmString = "> ${timeSignature2} 분에 ${timeSignature1} 박자 / $bpm BPM";
-    });
-    if (timeSignature1!=0 && timeSignature2!=0 && bpm!=0) {
-      bpmSet = true;
-      isComposeReady();
-      Future.delayed(const Duration(milliseconds: 250), (){
-        _expandContainer((currentQuestion + 1) % 3);
-      });
-    }
   }
 
   void _selectInst (int i) {
@@ -122,25 +94,39 @@ class _AiComposeState extends State<AiCompose> {
 
   void isComposeReady() {
     setState(() {
-      composeReady = selectedGenre!=-1 && (selectedRhythm!=-1 || bpmSet) && selectedInst.contains(true);
+      composeReady = selectedGenre!=-1 && bpmSet && selectedInst.contains(true);
     });
+  }
+
+  Map<String, dynamic> optionsToJson() {
+    var insts = [];
+    for (int i = 0; i<instruments.length; i++) {
+      if(selectedInst[i]) {
+        insts.add(instruments[i]);
+      }
+    }
+    var bpm = selectedBpm==0 ? "slow" : selectedBpm==1 ? "moderate" : "fast";
+    var currentTime = DateFormat('yyyyMMdd_HHmm').format(DateTime.now());
+    return {"selected_instruments": insts,
+    "genre": genre[selectedGenre],
+    "time_signature": timeSignature[selectedTimeSig],
+    "playtime": "60",
+    "bars": "16",
+    "pitch_range": "5",
+    "key": "C major",
+    "tempo": bpm,
+    "current_time": currentTime};
   }
 
   @override
   void initState() {
     _scrollController = ScrollController();
-    _rhythmController1 = TextEditingController();
-    _rhythmController2 = TextEditingController();
-    _rhythmController3 = TextEditingController();
     super.initState();
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
-    _rhythmController1.dispose();
-    _rhythmController2.dispose();
-    _rhythmController3.dispose();
     super.dispose();
   }
 
@@ -185,6 +171,8 @@ class _AiComposeState extends State<AiCompose> {
                                 InkWell(
                                   onTap: (){
                                     if (composeReady) {
+                                      sendingData = optionsToJson();
+                                      attributeController.sendingData = sendingData;
                                       Navigator.of(context).pushReplacement(
                                         MaterialPageRoute(builder: (
                                             context) => const ComposeIng(),),);
@@ -285,7 +273,7 @@ class _AiComposeState extends State<AiCompose> {
                                           },
                                           child: Row(
                                             children: [
-                                              qNum(2, selectedRhythm==-1 && !bpmSet),
+                                              qNum(2, !bpmSet),
                                               SizedBox(width: 15,),
                                               Text("어떤 리듬을 원하시나요? (박자, BPM)", style: semiBold(fontSize3(screenWidth)),)
                                             ],
@@ -309,92 +297,95 @@ class _AiComposeState extends State<AiCompose> {
                                           child: Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
-                                              Expanded(
-                                                flex: 1,
-                                                child: Text("·  리듬 선택하기", style: semiBold(fontSize3(screenWidth)),)
-                                              ),
-                                              Expanded(
-                                                flex: 8,
-                                                child: Container(
-                                                  decoration: gbBox(1),
-                                                  child: Padding(
-                                                    padding: EdgeInsets.all(composeButtonPaddingH(screenWidth)),
-                                                    child: MediaQuery.removePadding(
-                                                      context: context,
-                                                      removeTop: true,
-                                                      child: Scrollbar(
-                                                        controller: _scrollController,
-                                                        thumbVisibility: true,
-                                                        radius: const Radius.circular(2),
-                                                        child: ListView.builder(
-                                                          controller: _scrollController,
-                                                          padding: EdgeInsets.zero,
-                                                          itemCount: rhythm.length,
-                                                          itemBuilder: (context, index){
-                                                            return Padding(
-                                                              padding: const EdgeInsets.all(3.0),
+                                              Flexible(child: Text("·  박자", style: semiBold(fontSize3(screenWidth)),)),
+                                              Flexible(
+                                                child: Row(
+                                                  children: [
+                                                    SizedBox(
+                                                      height: 60,
+                                                      child: ListView.builder(
+                                                          scrollDirection: Axis.horizontal,
+                                                          shrinkWrap: true,
+                                                          itemCount: timeSignature.length,
+                                                          itemBuilder: (context, index) {
+                                                            return SizedBox(
+                                                              width: screenWidth*0.11,
                                                               child: InkWell(
                                                                 onTap: (){
-                                                                  _selectRhythm(index);
+                                                                  setState(() {
+                                                                    selectedTimeSig = index;
+                                                                  });
+                                                                  _setBpm(selectedTimeSig, selectedBpm);
                                                                 },
                                                                 child: Row(
                                                                   children: [
-                                                                    Container(
-                                                                      width: screenHeight*0.02,
-                                                                      height: screenHeight*0.02,
-                                                                      decoration: selectedRhythm!=index ? questionNum():
+                                                                    Padding(
+                                                                      padding: EdgeInsets.symmetric(
+                                                                          horizontal: composeGap(MediaQuery.of(context).size.width),
+                                                                          vertical: composeGap(MediaQuery.of(context).size.width)
+                                                                      ),
+                                                                      child: Container(
+                                                                        width: MediaQuery.of(context).size.height*0.02,
+                                                                        height: MediaQuery.of(context).size.height*0.02,
+                                                                        decoration: selectedTimeSig!=index ? questionNum() :
                                                                         BoxDecoration(
-                                                                            borderRadius: BorderRadius.all(Radius.circular(50.0)),
-                                                                          color: gbBlue
+                                                                            borderRadius: const BorderRadius.all(Radius.circular(50.0)),
+                                                                            color: gbBlue
                                                                         ),
+                                                                      ),
                                                                     ),
-                                                                    const SizedBox(width: 10,),
-                                                                    Text(rhythm[index],style: semiBold(fontSize3(screenWidth)),)
+                                                                    Text(index!=6 ? "${timeSignature[index]}박자" : "그 외",style: semiBold(fontSize3(MediaQuery.of(context).size.width)),)
                                                                   ],
                                                                 ),
                                                               ),
                                                             );
-                                                        }),
-                                                      ),
-                                                    ),
-                                                  ),
+                                                          }),
+                                                    )
+                                                  ],
                                                 ),
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                        SizedBox(width: screenWidth*0.035,),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Expanded(
-                                                  flex: 1,
-                                                  child: Text("·  박자와 BPM 선택하기", style: semiBold(fontSize3(screenWidth)),)
                                               ),
-                                              Expanded(
-                                                flex: 8,
-                                                child: Column(
+                                              SizedBox(height: 10,),
+                                              Flexible(child: Text("·  BPM", style: semiBold(fontSize3(screenWidth)),)),
+                                              Flexible(
+                                                child: Row(
                                                   children: [
-                                                    Flexible(
-                                                      child: Row(
-                                                        children: [
-                                                          rhythmField(screenHeight*0.1, screenHeight*0.1, _rhythmController1,2),
-                                                          Text(" / ",style:TextStyle(fontSize: fontSize3(screenWidth)*2),),
-                                                          rhythmField(screenHeight*0.1, screenHeight*0.1, _rhythmController2,2),
-                                                          Text(" 박자",style:semiBold(fontSize3(screenWidth)),),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    SizedBox(height: 10,),
-                                                    Flexible(
-                                                      child: Row(
-                                                        children: [
-                                                          rhythmField(screenHeight*0.24, screenHeight*0.11, _rhythmController3,3),
-                                                          Text(" BPM",style: semiBold(fontSize3(screenWidth)),),
-                                                        ],
-                                                      ),
-                                                    ),
+                                                    Container(
+                                                      height: 60,
+                                                      child: ListView.builder(
+                                                          scrollDirection: Axis.horizontal,
+                                                          shrinkWrap: true,
+                                                          itemCount: bpms.length,
+                                                          itemBuilder: (context, index) {
+                                                            return InkWell(
+                                                              onTap: (){
+                                                                setState(() {
+                                                                  selectedBpm = index;
+                                                                });
+                                                                _setBpm(selectedTimeSig, selectedBpm);
+                                                              },
+                                                              child: Row(
+                                                                children: [
+                                                                  Padding(
+                                                                    padding: EdgeInsets.symmetric(
+                                                                        horizontal: composeGap(MediaQuery.of(context).size.width),
+                                                                        vertical: composeGap(MediaQuery.of(context).size.width)
+                                                                    ),
+                                                                    child: Container(
+                                                                      width: MediaQuery.of(context).size.height*0.02,
+                                                                      height: MediaQuery.of(context).size.height*0.02,
+                                                                      decoration: selectedBpm!=index ? questionNum() :
+                                                                      BoxDecoration(
+                                                                          borderRadius: const BorderRadius.all(Radius.circular(50.0)),
+                                                                          color: gbBlue
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  Text(bpms[index],style: semiBold(fontSize3(MediaQuery.of(context).size.width)),)
+                                                                ],
+                                                              ),
+                                                            );
+                                                          }),
+                                                    )
                                                   ],
                                                 ),
                                               ),
@@ -552,32 +543,5 @@ class _AiComposeState extends State<AiCompose> {
     );
   }
 
-  Widget rhythmField (w, h, controller, maxLen) {
-    return Container(
-      width: w,
-      height: h,
-      decoration: gbBox(1),
-      child: Align(
-        alignment: Alignment.center,
-        child: TextField(
-          controller: controller,
-          keyboardType: TextInputType.number,
-          cursorColor: Colors.black,
-          maxLength: maxLen,
-          decoration: const InputDecoration(
-              border: InputBorder.none,
-              counterText: ''
-          ),
-          style: TextStyle(
-              fontSize: fontSize2(MediaQuery.of(context).size.width)
-          ),
-          textAlign: TextAlign.center,
-          onSubmitted: (value) {
-            _setBpm();
-          }
-        ),
-      ),
-    );
-  }
 
 }
