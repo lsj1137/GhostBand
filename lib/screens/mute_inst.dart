@@ -27,6 +27,8 @@ class _MuteInstState extends State<MuteInst> with SingleTickerProviderStateMixin
   String url = 'http://220.149.232.226:5010';
   List<dynamic> fileUrls = [];
   double progress = 0;
+  double tempProgress = 0;
+  double totalProgress = 0;
 
   bool _isPlaying = false;
   Duration _duration = Duration.zero;
@@ -99,9 +101,13 @@ class _MuteInstState extends State<MuteInst> with SingleTickerProviderStateMixin
       filePaths.add(otherFilePath);
 
       final response1 = await downloadFile(vocalUrl, vocalFilePath);
+      setState(() {totalProgress += 0.2;});
       final response2 = await downloadFile(pianoUrl, pianoFilePath);
+      setState(() {totalProgress += 0.2;});
       final response3 = await downloadFile(drumsUrl, drumFilePath);
+      setState(() {totalProgress += 0.2;});
       final response4 = await downloadFile(otherUrl, otherFilePath);
+      setState(() {totalProgress += 0.2;});
       final response5 = await downloadFile(bassUrl, bassFilePath);
 
       if (response1.statusCode==200 && response2.statusCode==200 && response3.statusCode==200 && response4.statusCode==200 && response5.statusCode==200) {
@@ -122,8 +128,9 @@ class _MuteInstState extends State<MuteInst> with SingleTickerProviderStateMixin
         if (total != -1) {
           setState(() {
             progress = received / total;
+            tempProgress = totalProgress+(progress/5);
           });
-          print('${path.split('/').last} Download progress: ${(received / total * 100).toStringAsFixed(0)}%');
+          print('${path.split('/').last} Download progress: ${(progress * 100).toStringAsFixed(0)}%');
         }
       },
     );
@@ -139,7 +146,13 @@ class _MuteInstState extends State<MuteInst> with SingleTickerProviderStateMixin
     if (result != null && result.files.single.path != null) {
       setState(() {
         _localFilePath = result.files.single.path!;
+        _audioPlayer.setSource(DeviceFileSource(_localFilePath));
+        _audioPlayer.stop();
         fileReady = true;
+        analyseStart = false;
+        analyseDone = false;
+        tempProgress = 0;
+        totalProgress = 0;
       });
     }
   }
@@ -149,17 +162,36 @@ class _MuteInstState extends State<MuteInst> with SingleTickerProviderStateMixin
       return;
     }
     if (!analyseDone || !instChecked.contains(false)) {
+      for (int i=0; i<5; i++) {
+        players[i].pause();
+      }
       if (_isPlaying) {
         _audioPlayer.pause();
       } else {
         _audioPlayer.play(DeviceFileSource(_localFilePath));
+        _seek(_position.inMilliseconds.toDouble()+300);
+      }
+    } else if (!instChecked.contains(true)) {
+      for (int i = 0; i < 5; i++) {
+        players[i].pause();
+      }
+      _audioPlayer.setVolume(0);
+      if (_isPlaying) {
+        _audioPlayer.pause();
+      } else {
+        _audioPlayer.play(DeviceFileSource(_localFilePath));
+        _seek(_position.inMilliseconds.toDouble()+300);
       }
     } else {
+      _audioPlayer.pause();
       for (int i=0; i<5; i++) {
         if (_isPlaying) {
           players[i].pause();
         } else {
-          if (instChecked[i]) {players[i].play(DeviceFileSource(filePaths[i]));}
+          if (instChecked[i]) {
+            players[i].play(DeviceFileSource(filePaths[i]));
+            _seek(_position.inMilliseconds.toDouble()+300);
+          }
         }
       }
     }
@@ -167,17 +199,27 @@ class _MuteInstState extends State<MuteInst> with SingleTickerProviderStateMixin
   }
 
   void _applyInst() {
+    if (!_isPlaying) return;
     if (!instChecked.contains(false)) {
-      _seek(_position.inMilliseconds.toDouble());
-      _audioPlayer.play(DeviceFileSource(_localFilePath));
       for (int i = 0; i < 5; i++) {
         players[i].pause();
       }
+      _audioPlayer.setVolume(1);
+      _audioPlayer.play(DeviceFileSource(_localFilePath));
+      _seek(_position.inMilliseconds.toDouble()+300);
+    } else if(!instChecked.contains(true)) {
+      for (int i = 0; i < 5; i++) {
+        players[i].pause();
+      }
+      _audioPlayer.setVolume(0);
+      _audioPlayer.play(DeviceFileSource(_localFilePath));
+      _seek(_position.inMilliseconds.toDouble()+300);
     } else {
+      _audioPlayer.pause();
       for (int i = 0; i < 5; i++) {
         if (instChecked[i]) {
-          _seek(_position.inMilliseconds.toDouble());
           players[i].play(DeviceFileSource(filePaths[i]));
+          _seek(_position.inMilliseconds.toDouble()+300);
         } else {
           players[i].pause();
         }
@@ -186,9 +228,14 @@ class _MuteInstState extends State<MuteInst> with SingleTickerProviderStateMixin
   }
 
   void _seek(double milliseconds) {
-    _audioPlayer.seek(Duration(milliseconds: milliseconds.toInt()));
-    for (int i=0; i<5; i++) {
-      players[i].seek(Duration(milliseconds: milliseconds.toInt()));
+    if (!analyseDone || !instChecked.contains(false) || !instChecked.contains(true)) {
+      _audioPlayer.seek(Duration(milliseconds: milliseconds.toInt()));
+    } else {
+      for (int i = 0; i < 5; i++) {
+        if (instChecked[i]) {
+          players[i].seek(Duration(milliseconds: milliseconds.toInt()));
+        }
+      }
     }
   }
 
@@ -384,7 +431,7 @@ class _MuteInstState extends State<MuteInst> with SingleTickerProviderStateMixin
             turns: _animationController,
             child: Image.asset("assets/images/loading.png", width: 100,),
           ),
-          Text("분석중...",style: semiBold(fontSize3(MediaQuery.of(context).size.width)),textAlign: TextAlign.center,)
+          Text("음원을 분석중이에요...${(tempProgress*100).toStringAsFixed(0)}%",style: semiBold(fontSize3(MediaQuery.of(context).size.width)),textAlign: TextAlign.center,)
         ],
       ),
     );
