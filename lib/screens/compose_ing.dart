@@ -37,6 +37,9 @@ class _ComposeIngState extends State<ComposeIng> {
 
   Future<void> sendPostRequest(data) async {
     const String url = 'http://220.149.232.224:5001/test_model';
+    // http://220.149.232.224:5005/run_model
+    // http://220.149.232.224:5001/test_model
+    // http://220.149.232.226:5005/run_model
     final Map<String, String> headers = {
       'Content-Type': 'application/json',
       'Accept': 'application/json',

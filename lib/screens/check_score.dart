@@ -17,6 +17,7 @@ class CheckScore extends StatefulWidget {
 class _CheckScoreState extends State<CheckScore> {
   List<FileSystemEntity> _files = [];
   List<String> midiFilePaths = [];
+  List<String> pdfFilePaths = [];
   List<List<dynamic>> audioPlayerInstances = []; // 0: isPlaying, 1: duration, 2:position, 3: instance
   List<DataRow> rows = [];
 
@@ -36,20 +37,19 @@ class _CheckScoreState extends State<CheckScore> {
           final fileDir = _files[index].path;
           makeAudioPlayerInstance(index);
           var fileName = '';
-          var pdfPath = '';
           Directory(fileDir).listSync().forEach((file) {
             if (file.path.split('.').last=='mid') {
               midiFilePaths.add(file.path);
               fileName = file.path.split('/').last;
             } else if (file.path.split('.').last=='pdf') {
-              pdfPath = file.path;
+              pdfFilePaths.add(file.path);
             }
           });
           var genDate = changeDateFormat(fileDir.split('/').last);
           return DataRow(
               cells: [
-                DataCell(Text('${index + 1}')),
-                DataCell(fileLink(fileName, pdfPath)),
+                DataCell(Center(child: Text('${index + 1}'))),
+                DataCell(fileLink(fileName, pdfFilePaths[index], midiFilePaths[index])),
                 DataCell(loadMetaData(fileDir)),
                 DataCell(Center(child: Text(genDate))),
                 DataCell(player(index)),
@@ -86,11 +86,11 @@ class _CheckScoreState extends State<CheckScore> {
     });
   }
 
-  Widget fileLink(String fileName, String pdfPath) {
+  Widget fileLink(String fileName, String pdfPath, String midiPath) {
     return Center(
         child: InkWell(
           onTap: () {
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) => ScoreDetail(pdfPath: pdfPath),),);
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) => ScoreDetail(pdfPath: pdfPath, midiPath: midiPath,),),);
           },
           child: Text(fileName,
             style: TextStyle(decoration: TextDecoration.underline),
@@ -162,6 +162,50 @@ class _CheckScoreState extends State<CheckScore> {
     }
   }
 
+  Future<void> _copyFile(int index) async {
+    var midiPath = midiFilePaths[index];
+    var pdfPath = pdfFilePaths[index];
+
+    // Download 폴더 경로 가져오기
+    Directory? downloadDir = await getExternalStorageDirectory();
+    var defaultPath = downloadDir?.path.split('/').sublist(0,4).join('/');
+    print(defaultPath);
+    String midiDownloadPath = '$defaultPath/Download/${midiPath.split('/').last}';
+    String pdfDownloadPath = '$defaultPath/Download/${pdfPath.split('/').last}';
+
+    // 파일 복사
+    File sourceFile = File(midiPath);
+    if (await sourceFile.exists()) {
+      File targetFile = File(midiDownloadPath);
+      await targetFile.create(recursive: true);
+      await sourceFile.copy(targetFile.path);
+
+      // 파일 복사 완료 메시지 출력
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Download 폴더에 저장되었습니다!')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('원본 파일을 찾을 수 없습니다!')),
+      );
+    }
+    File sourceFile2 = File(pdfPath);
+    if (await sourceFile2.exists()) {
+      File targetFile2 = File(pdfDownloadPath);
+      await targetFile2.create(recursive: true);
+      await sourceFile2.copy(targetFile2.path);
+
+      // 파일 복사 완료 메시지 출력
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Download 폴더에 저장되었습니다!')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('원본 파일을 찾을 수 없습니다!')),
+      );
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -222,6 +266,7 @@ class _CheckScoreState extends State<CheckScore> {
                               child: SingleChildScrollView(
                                 padding: const EdgeInsets.only(top: 20),
                                 child: DataTable(
+                                  horizontalMargin: 0,
                                     headingTextStyle: semiBold(22),
                                     dataTextStyle: semiBold(fontSize4(screenWidth)),
                                     columnSpacing: 10,
@@ -230,9 +275,9 @@ class _CheckScoreState extends State<CheckScore> {
                                     border: const TableBorder.symmetric(inside: BorderSide(color: Color(0xffdbdbdb)),),
                                     showBottomBorder: true,
                                     columns: [
-                                      DataColumn(label: SizedBox(width: screenWidth*0.03, child: Center(child: Text('순서')))),
+                                      DataColumn(label: SizedBox(width: screenWidth*0.05, child: Center(child: Text('순서')))),
                                       DataColumn(label: SizedBox(width: screenWidth*0.15, child: Center(child: Text('곡 이름')))),
-                                      DataColumn(label: SizedBox(width: screenWidth*0.17, child: Center(child: Text('악기 종류')))),
+                                      DataColumn(label: SizedBox(width: screenWidth*0.215, child: Center(child: Text('악기 종류')))),
                                       DataColumn(label: SizedBox(width: screenWidth*0.11, child: Center(child: Text('생성일시')))),
                                       DataColumn(label: SizedBox(width: screenWidth*0.18, child: Center(child: Text('재생바')))),
                                       DataColumn(label: SizedBox(width: screenWidth*0.11, child: Center(child: Text('옵션')))),
@@ -260,8 +305,10 @@ class _CheckScoreState extends State<CheckScore> {
       children: [
         SliderTheme(
           data: SliderThemeData(
+              trackHeight: 3.0,
+              trackShape: RectangularSliderTrackShape(),
               overlayShape: SliderComponentShape.noOverlay,
-              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 7)
+              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6)
           ),
           child: Slider(
             thumbColor: Colors.black,
@@ -285,7 +332,7 @@ class _CheckScoreState extends State<CheckScore> {
         children: [
           InkWell(
             onTap: () {
-              //TODO
+              _copyFile(index);
             },
             child: Image.asset("assets/images/download.png",width: 30,),
           ),

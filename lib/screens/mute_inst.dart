@@ -1,7 +1,11 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../config/custom_switch.dart';
 import '../config/gb_theme.dart';
@@ -13,78 +17,118 @@ class MuteInst extends StatefulWidget {
   State<MuteInst> createState() => _MuteInstState();
 }
 
-class _MuteInstState extends State<MuteInst> {
+class _MuteInstState extends State<MuteInst> with SingleTickerProviderStateMixin {
   final AudioPlayer _audioPlayer = AudioPlayer();
-  final AudioPlayer _bassPlayer = AudioPlayer();
-  final AudioPlayer _drumPlayer = AudioPlayer();
-  final AudioPlayer _pianoPlayer = AudioPlayer();
-  final AudioPlayer _vocalPlayer = AudioPlayer();
-  final AudioPlayer _othersPlayer = AudioPlayer();
+  List<AudioPlayer> players = [AudioPlayer(), AudioPlayer(), AudioPlayer(), AudioPlayer(), AudioPlayer()];
+  // 0:bass, 1:drum, 2:piano, 3:vocal, 4:others
+  late AnimationController _animationController;
+  final Dio _dio = Dio();
+
+  String url = 'http://220.149.232.226:5010';
+  List<dynamic> fileUrls = [];
+  double progress = 0;
 
   bool _isPlaying = false;
   Duration _duration = Duration.zero;
   Duration _position = Duration.zero;
 
   String _localFilePath = '';
+  List<String> filePaths = [];
 
   bool fileReady = false;
+  bool analyseStart = false;
   bool analyseDone = false;
-  bool _bassChecked = true;
-  bool _drumChecked = true;
-  bool _pianoChecked = true;
-  bool _vocalChecked = true;
-  bool _othersChecked = true;
+  List<bool> instChecked = [true, true, true, true, true];
 
-  @override
-  void initState() {
-    super.initState();
-    _audioPlayer.onDurationChanged.listen((Duration d) {
-      setState(() => _duration = d);
+  Future<String> _uploadFile() async {
+    String fileName = _localFilePath.split('/').last; // 파일 이름 추출
+    FormData formData = FormData.fromMap({
+      "file": await MultipartFile.fromFile(
+        _localFilePath,
+        filename: fileName,
+      ),
     });
-    _audioPlayer.onPositionChanged.listen((Duration p) {
-      setState(() => _position = p);
-    });
-    _bassPlayer.onDurationChanged.listen((Duration d) {
-      setState(() => _duration = d);
-    });
-    _bassPlayer.onPositionChanged.listen((Duration p) {
-      setState(() => _position = p);
-    });
-    _drumPlayer.onDurationChanged.listen((Duration d) {
-      setState(() => _duration = d);
-    });
-    _drumPlayer.onPositionChanged.listen((Duration p) {
-      setState(() => _position = p);
-    });
-    _pianoPlayer.onDurationChanged.listen((Duration d) {
-      setState(() => _duration = d);
-    });
-    _pianoPlayer.onPositionChanged.listen((Duration p) {
-      setState(() => _position = p);
-    });
-    _vocalPlayer.onDurationChanged.listen((Duration d) {
-      setState(() => _duration = d);
-    });
-    _vocalPlayer.onPositionChanged.listen((Duration p) {
-      setState(() => _position = p);
-    });
-    _othersPlayer.onDurationChanged.listen((Duration d) {
-      setState(() => _duration = d);
-    });
-    _othersPlayer.onPositionChanged.listen((Duration p) {
-      setState(() => _position = p);
-    });
+
+    try {
+      Response response = await _dio.post('$url/separator', data: formData,
+        options: Options(
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        ),
+      );
+
+      // 업로드 성공 시 처리
+      print("Upload successful: ${response.data}");
+      fileUrls = response.data['file_urls'];
+      print(fileUrls);
+      analyseFile();
+      return response.statusCode.toString();
+    } catch (e) {
+      // 오류 처리
+      print("Error uploading file: $e");
+      return e.toString();
+    }
   }
 
-  @override
-  void dispose() {
-    _audioPlayer.dispose();
-    _bassPlayer.dispose();
-    _drumPlayer.dispose();
-    _pianoPlayer.dispose();
-    _vocalPlayer.dispose();
-    _othersPlayer.dispose();
-    super.dispose();
+  Future<void> analyseFile() async {
+    final String vocalUrl = fileUrls[0]; // 다운로드할 파일의 URL
+    final String pianoUrl = fileUrls[1];
+    final String drumsUrl = fileUrls[2];
+    final String otherUrl = fileUrls[3];
+    final String bassUrl = fileUrls[4];
+    const String vocalFileName = 'vocal.wav';
+    const String pianoFileName = 'piano.wav';
+    const String drumFileName = 'drum.wav';
+    const String otherFileName = 'other.wav';
+    const String bassFileName = 'bass.wav';
+
+    try {
+      // 로컬 저장소 경로 가져오기
+      final directory = await getApplicationDocumentsDirectory();
+      final vocalFilePath = '${directory.path}/mute_analysis/$vocalFileName';
+      final pianoFilePath = '${directory.path}/mute_analysis/$pianoFileName';
+      final drumFilePath = '${directory.path}/mute_analysis/$drumFileName';
+      final otherFilePath = '${directory.path}/mute_analysis/$otherFileName';
+      final bassFilePath = '${directory.path}/mute_analysis/$bassFileName';
+
+      filePaths.add(bassFilePath);
+      filePaths.add(drumFilePath);
+      filePaths.add(pianoFilePath);
+      filePaths.add(vocalFilePath);
+      filePaths.add(otherFilePath);
+
+      final response1 = await downloadFile(vocalUrl, vocalFilePath);
+      final response2 = await downloadFile(pianoUrl, pianoFilePath);
+      final response3 = await downloadFile(drumsUrl, drumFilePath);
+      final response4 = await downloadFile(otherUrl, otherFilePath);
+      final response5 = await downloadFile(bassUrl, bassFilePath);
+
+      if (response1.statusCode==200 && response2.statusCode==200 && response3.statusCode==200 && response4.statusCode==200 && response5.statusCode==200) {
+        setState(() {
+          analyseDone = true;
+        });
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  Future<Response> downloadFile(String fileUrl, String path) async {
+    print(path);
+    // 파일 다운로드
+    final response = await _dio.download('$url/download?file_path=$fileUrl', path,
+      onReceiveProgress: (received, total) {
+        if (total != -1) {
+          setState(() {
+            progress = received / total;
+          });
+          print('${path.split('/').last} Download progress: ${(received / total * 100).toStringAsFixed(0)}%');
+        }
+      },
+    );
+    print('File saved to: $path');
+    return response;
   }
 
   Future<void> _pickFile() async {
@@ -101,19 +145,51 @@ class _MuteInstState extends State<MuteInst> {
   }
 
   void _playPause() {
-    if (_localFilePath=='') {
+    if (!fileReady) {
       return;
     }
-    if (_isPlaying) {
-      _audioPlayer.pause();
+    if (!analyseDone || !instChecked.contains(false)) {
+      if (_isPlaying) {
+        _audioPlayer.pause();
+      } else {
+        _audioPlayer.play(DeviceFileSource(_localFilePath));
+      }
     } else {
-      _audioPlayer.play(DeviceFileSource(_localFilePath));
+      for (int i=0; i<5; i++) {
+        if (_isPlaying) {
+          players[i].pause();
+        } else {
+          if (instChecked[i]) {players[i].play(DeviceFileSource(filePaths[i]));}
+        }
+      }
     }
     setState(() => _isPlaying = !_isPlaying);
   }
 
-  void _seek(double seconds) {
-    _audioPlayer.seek(Duration(seconds: seconds.toInt()));
+  void _applyInst() {
+    if (!instChecked.contains(false)) {
+      _seek(_position.inMilliseconds.toDouble());
+      _audioPlayer.play(DeviceFileSource(_localFilePath));
+      for (int i = 0; i < 5; i++) {
+        players[i].pause();
+      }
+    } else {
+      for (int i = 0; i < 5; i++) {
+        if (instChecked[i]) {
+          _seek(_position.inMilliseconds.toDouble());
+          players[i].play(DeviceFileSource(filePaths[i]));
+        } else {
+          players[i].pause();
+        }
+      }
+    }
+  }
+
+  void _seek(double milliseconds) {
+    _audioPlayer.seek(Duration(milliseconds: milliseconds.toInt()));
+    for (int i=0; i<5; i++) {
+      players[i].seek(Duration(milliseconds: milliseconds.toInt()));
+    }
   }
 
   String _formatDuration(Duration duration) {
@@ -122,6 +198,39 @@ class _MuteInstState extends State<MuteInst> {
     final minutes = twoDigits(duration.inMinutes.remainder(60));
     final seconds = twoDigits(duration.inSeconds.remainder(60));
     return [if (duration.inHours > 0) hours, minutes, seconds].join(':');
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _audioPlayer.onDurationChanged.listen((Duration d) {
+      setState(() => _duration = d);
+    });
+    _audioPlayer.onPositionChanged.listen((Duration p) {
+      setState(() => _position = p);
+    });
+    for (int i=0; i<5; i++) {
+      players[i].onDurationChanged.listen((Duration d) {
+        setState(() => _duration = d);
+      });
+      players[i].onPositionChanged.listen((Duration p) {
+        setState(() => _position = p);
+      });
+    }
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _audioPlayer.dispose();
+    for (int i=0; i<5; i++) {
+      players[i].dispose();
+    }
+    _animationController.dispose();
+    super.dispose();
   }
 
   @override
@@ -186,13 +295,19 @@ class _MuteInstState extends State<MuteInst> {
                                   ),
                                 ),
                               ),
-                              InkWell(
-                                onTap: (){
-                                  if (fileReady) {
-
-                                  }
-                                },
-                                child: startButton(screenWidth, fileReady, "분석 시작"),
+                              Visibility(
+                                visible: !analyseDone,
+                                child: InkWell(
+                                  onTap: (){
+                                    if (fileReady) {
+                                      _uploadFile();
+                                      setState(() {
+                                        analyseStart = true;
+                                      });
+                                    }
+                                  },
+                                  child: startButton(screenWidth, fileReady, "분석 시작"),
+                                ),
                               )
                             ],
                           ),
@@ -206,7 +321,7 @@ class _MuteInstState extends State<MuteInst> {
                                   Padding(
                                     padding: const EdgeInsets.only(top: 3.0),
                                     child: InkWell(
-                                      onTap: () {_seek(_position.inSeconds.toDouble()-5);},
+                                      onTap: () {_seek(_position.inMilliseconds.toDouble()-5000);},
                                       child: Image.asset("assets/images/5s_forward.png"),
                                     ),
                                   ),
@@ -217,7 +332,7 @@ class _MuteInstState extends State<MuteInst> {
                                   Padding(
                                     padding: const EdgeInsets.only(top: 3.0),
                                     child: InkWell(
-                                      onTap: () {_seek(_position.inSeconds.toDouble()+5);},
+                                      onTap: () {_seek(_position.inMilliseconds.toDouble()+5000);},
                                       child: Image.asset("assets/images/5s_back.png"),
                                     ),
                                   )
@@ -231,155 +346,23 @@ class _MuteInstState extends State<MuteInst> {
                           ),
                           SliderTheme(
                             data: SliderThemeData(
+                                trackHeight: 3.0,
+                                trackShape: RectangularSliderTrackShape(),
                               overlayShape: SliderComponentShape.noOverlay
                             ),
                             child: Slider(
                               thumbColor: Colors.black,
                               activeColor: Colors.grey, // 재생 된 부분
                               inactiveColor: Colors.grey, // 재생 안된 부분
-                              value: _position.inSeconds.toDouble(),
-                              max: _duration.inSeconds.toDouble(),
+                              value: _position.inMilliseconds.toDouble(),
+                              max: _duration.inMilliseconds.toDouble(),
                               onChanged: (value) {
                                 _seek(value);
                               },
                             ),
                           ),
-                          Expanded(
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(vertical: menuPaddingSize(screenWidth)),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Visibility(
-                                        visible: !analyseDone,
-                                        child: Column(
-                                          children: [
-                                            Expanded(
-                                              child: Container(
-                                                decoration:gbBox(1),
-                                                child: Padding(
-                                                  padding: EdgeInsets.symmetric(horizontal: menuPaddingSize(screenWidth)+10),
-                                                  child: Row(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                    children: [
-                                                      Text("베이스 기타", style: semiBold(fontSize2(screenWidth)-5),),
-                                                      CustomSwitch(onCheckChange: (bool isShow) {
-                                                        setState(() {
-                                                          _bassChecked = isShow;
-                                                        });
-                                                      },)
-                                                    ],
-                                                  ),
-                                                )
-                                              )
-                                            ),
-                                            SizedBox(height: menuGap(screenWidth),),
-                                            Expanded(
-                                                child: Container(
-                                                    decoration:gbBox(1),
-                                                    child: Padding(
-                                                      padding: EdgeInsets.symmetric(horizontal: menuPaddingSize(screenWidth)+10),
-                                                      child: Row(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                        children: [
-                                                          Text("드럼", style: semiBold(fontSize2(screenWidth)-5),),
-                                                          CustomSwitch(
-                                                              onCheckChange: (bool? value) {
-                                                                setState(() {
-                                                                  _drumChecked = value ?? false;
-                                                                });
-                                                              }
-                                                          )
-                                                        ],
-                                                      ),
-                                                    )
-                                                )
-                                            ),
-                                            SizedBox(height: menuGap(screenWidth),),
-                                            Expanded(
-                                                child: Container(
-                                                    decoration:gbBox(1),
-                                                    child: Padding(
-                                                      padding: EdgeInsets.symmetric(horizontal: menuPaddingSize(screenWidth)+10),
-                                                      child: Row(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                        children: [
-                                                          Text("피아노", style: semiBold(fontSize2(screenWidth)-5),),
-                                                          CustomSwitch(
-                                                              onCheckChange: (bool? value) {
-                                                                setState(() {
-                                                                  _pianoChecked = value ?? false;
-                                                                });
-                                                              }
-                                                          )
-                                                        ],
-                                                      ),
-                                                    )
-                                                )
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    VerticalDivider(width: menuGap(screenWidth)*2,),
-                                    Expanded(
-                                      child: Visibility(
-                                        visible: !analyseDone,
-                                        child: Column(
-                                          children: [
-                                            Expanded(
-                                                child: Container(
-                                                    decoration:gbBox(1),
-                                                    child: Padding(
-                                                      padding: EdgeInsets.symmetric(horizontal: menuPaddingSize(screenWidth)+10),
-                                                      child: Row(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                        children: [
-                                                          Text("보컬", style: semiBold(fontSize2(screenWidth)-5),),
-                                                          CustomSwitch(
-                                                              onCheckChange: (bool? value) {
-                                                                setState(() {
-                                                                  _vocalChecked = value ?? false;
-                                                                });
-                                                              }
-                                                          )
-                                                        ],
-                                                      ),
-                                                    )
-                                                )
-                                            ),
-                                            SizedBox(height: menuGap(screenWidth),),
-                                            Expanded(
-                                                child: Container(
-                                                    decoration:gbBox(1),
-                                                    child: Padding(
-                                                      padding: EdgeInsets.symmetric(horizontal: menuPaddingSize(screenWidth)+10),
-                                                      child: Row(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                        children: [
-                                                          Text("기타 등등", style: semiBold(fontSize2(screenWidth)-5),),
-                                                          CustomSwitch(
-                                                              onCheckChange: (bool? value) {
-                                                                setState(() {
-                                                                  _othersChecked = value ?? false;
-                                                                });
-                                                              }
-                                                          )
-                                                        ],
-                                                      ),
-                                                    )
-                                                )
-                                            ),
-                                            SizedBox(height: menuGap(screenWidth),),
-                                            Expanded(child: Container()),
-                                          ],
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              )
-                          ),
+                          analyseStart && !analyseDone ?
+                          loading() : menus()
                         ],
                       ),
                     ),
@@ -389,6 +372,166 @@ class _MuteInstState extends State<MuteInst> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget loading() {
+    return Expanded(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          RotationTransition(
+            turns: _animationController,
+            child: Image.asset("assets/images/loading.png", width: 100,),
+          ),
+          Text("분석중...",style: semiBold(fontSize3(MediaQuery.of(context).size.width)),textAlign: TextAlign.center,)
+        ],
+      ),
+    );
+  }
+  
+  Widget menus() {
+    var screenWidth = MediaQuery.of(context).size.width;
+    return Expanded(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: menuPaddingSize(screenWidth)),
+          child: Row(
+            children: [
+              Expanded(
+                child: Visibility(
+                  visible: analyseDone,
+                  child: Column(
+                    children: [
+                      Expanded(
+                          child: Container(
+                              decoration:gbBox(1),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: menuPaddingSize(screenWidth)+10),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text("베이스 기타", style: semiBold(fontSize2(screenWidth)-5),),
+                                    CustomSwitch(onCheckChange: (bool isShow) {
+                                      setState(() {
+                                        instChecked[0] = isShow;
+                                      });
+                                      _applyInst();
+                                    },)
+                                  ],
+                                ),
+                              )
+                          )
+                      ),
+                      SizedBox(height: menuGap(screenWidth),),
+                      Expanded(
+                          child: Container(
+                              decoration:gbBox(1),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: menuPaddingSize(screenWidth)+10),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text("드럼", style: semiBold(fontSize2(screenWidth)-5),),
+                                    CustomSwitch(
+                                        onCheckChange: (bool isShow) {
+                                          setState(() {
+                                            instChecked[1] = isShow;
+                                          });
+                                          _applyInst();
+                                        }
+                                    )
+                                  ],
+                                ),
+                              )
+                          )
+                      ),
+                      SizedBox(height: menuGap(screenWidth),),
+                      Expanded(
+                          child: Container(
+                              decoration:gbBox(1),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: menuPaddingSize(screenWidth)+10),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text("피아노", style: semiBold(fontSize2(screenWidth)-5),),
+                                    CustomSwitch(
+                                        onCheckChange: (bool isShow) {
+                                          setState(() {
+                                            instChecked[2] = isShow;
+                                          });
+                                          _applyInst();
+                                        }
+                                    )
+                                  ],
+                                ),
+                              )
+                          )
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              VerticalDivider(width: menuGap(screenWidth)*2,),
+              Expanded(
+                child: Visibility(
+                  visible: analyseDone,
+                  child: Column(
+                    children: [
+                      Expanded(
+                          child: Container(
+                              decoration:gbBox(1),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: menuPaddingSize(screenWidth)+10),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text("보컬", style: semiBold(fontSize2(screenWidth)-5),),
+                                    CustomSwitch(
+                                        onCheckChange: (bool isShow) {
+                                          setState(() {
+                                            instChecked[3] = isShow;
+                                          });
+                                          _applyInst();
+                                        }
+                                    )
+                                  ],
+                                ),
+                              )
+                          )
+                      ),
+                      SizedBox(height: menuGap(screenWidth),),
+                      Expanded(
+                          child: Container(
+                              decoration:gbBox(1),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: menuPaddingSize(screenWidth)+10),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text("기타 등등", style: semiBold(fontSize2(screenWidth)-5),),
+                                    CustomSwitch(
+                                        onCheckChange: (bool isShow) {
+                                          setState(() {
+                                            instChecked[4] = isShow;
+                                          });
+                                          _applyInst();
+                                        }
+                                    )
+                                  ],
+                                ),
+                              )
+                          )
+                      ),
+                      SizedBox(height: menuGap(screenWidth),),
+                      Expanded(child: Container()),
+                    ],
+                  ),
+                ),
+              )
+            ],
+          ),
+        )
     );
   }
 }

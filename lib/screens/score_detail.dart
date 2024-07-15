@@ -9,8 +9,9 @@ import 'package:pdfx/pdfx.dart';
 import '../config/gb_theme.dart';
 
 class ScoreDetail extends StatefulWidget {
-  const ScoreDetail({super.key, required this.pdfPath});
+  const ScoreDetail({super.key, required this.pdfPath, required this.midiPath});
   final String pdfPath;
+  final String midiPath;
 
   @override
   State<ScoreDetail> createState() => _ScoreDetailState();
@@ -27,21 +28,19 @@ class _ScoreDetailState extends State<ScoreDetail> {
   bool _isPlaying = false;
   Duration _duration = Duration.zero;
   Duration _position = Duration.zero;
+  double _volume = 0.5;
 
   bool autoTurnPage = false;
 
 
-  // void _playPause() {
-  //   if (_localFilePath=='') {
-  //     return;
-  //   }
-  //   if (_isPlaying) {
-  //     _audioPlayer.pause();
-  //   } else {
-  //     _audioPlayer.play(DeviceFileSource(_localFilePath));
-  //   }
-  //   setState(() => _isPlaying = !_isPlaying);
-  // }
+  void _playPause() {
+    if (_isPlaying) {
+      _audioPlayer.pause();
+    } else {
+      _audioPlayer.play(DeviceFileSource(widget.midiPath));
+    }
+    setState(() => _isPlaying = !_isPlaying);
+  }
 
   void _seek(double seconds) {
     _audioPlayer.seek(Duration(seconds: seconds.toInt()));
@@ -67,11 +66,19 @@ class _ScoreDetailState extends State<ScoreDetail> {
         initialPage: initialPage
     );
     _textEditingController.text = initialPage.toString();
+    _audioPlayer.setVolume(_volume);
+    _audioPlayer.onDurationChanged.listen((Duration d) {
+      setState(() => _duration = d);
+    });
+    _audioPlayer.onPositionChanged.listen((Duration p) {
+      setState(() => _position = p);
+    });
   }
 
   @override
   void dispose() {
     pdfController.dispose();
+    _audioPlayer.dispose();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
@@ -109,7 +116,13 @@ class _ScoreDetailState extends State<ScoreDetail> {
                       ],
                     ),
                   ),
-                  Image.asset("assets/images/play.png",height: 20,),
+                  InkWell(
+                    onTap: () {_playPause();},
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Image.asset(_isPlaying?"assets/images/pause.png":"assets/images/play.png",height: 20,),
+                    ),
+                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -117,8 +130,10 @@ class _ScoreDetailState extends State<ScoreDetail> {
                         width: screenWidth*0.33,
                         child: SliderTheme(
                           data: SliderThemeData(
+                              trackHeight: 3.0,
+                              trackShape: RectangularSliderTrackShape(),
                               overlayShape: SliderComponentShape.noOverlay,
-                              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10)
+                              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8)
                           ),
                           child: Slider(
                             thumbColor: Colors.black,
@@ -132,7 +147,7 @@ class _ScoreDetailState extends State<ScoreDetail> {
                           ),
                         ),
                       ),
-                      Text(_formatDuration(_position),style: semiBold(fontSize3(MediaQuery.of(context).size.width)-5),)
+                      Text(_formatDuration(_position),style: normal(fontSize3(MediaQuery.of(context).size.width)),)
                     ],
                   ),
                   Row(
@@ -143,17 +158,24 @@ class _ScoreDetailState extends State<ScoreDetail> {
                         width: screenWidth*0.13,
                         child: SliderTheme(
                           data: SliderThemeData(
+                              trackHeight: 3.0,
+                              trackShape: RectangularSliderTrackShape(),
                               overlayShape: SliderComponentShape.noOverlay,
-                              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10)
+                              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8)
                           ),
                           child: Slider(
                             thumbColor: Colors.black,
                             activeColor: Colors.grey, // 재생 된 부분
                             inactiveColor: Colors.grey, // 재생 안된 부분
-                            value: _position.inSeconds.toDouble(),
-                            max: _duration.inSeconds.toDouble(),
+                            value: _volume,
+                            min: 0,
+                            max: 1,
+                            divisions: 20,
                             onChanged: (value) {
-                              _seek(value);
+                              setState(() {
+                                _volume = value;
+                                _audioPlayer.setVolume(_volume);
+                              });
                             },
                           ),
                         ),
