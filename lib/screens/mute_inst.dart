@@ -1,8 +1,5 @@
-import 'dart:io';
-
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:path_provider/path_provider.dart';
@@ -64,7 +61,7 @@ class _MuteInstState extends State<MuteInst> with SingleTickerProviderStateMixin
       print("Upload successful: ${response.data}");
       fileUrls = response.data['file_urls'];
       print(fileUrls);
-      analyseFile();
+      _analyseFile();
       return response.statusCode.toString();
     } catch (e) {
       // 오류 처리
@@ -73,7 +70,7 @@ class _MuteInstState extends State<MuteInst> with SingleTickerProviderStateMixin
     }
   }
 
-  Future<void> analyseFile() async {
+  Future<void> _analyseFile() async {
     final String vocalUrl = fileUrls[0]; // 다운로드할 파일의 URL
     final String pianoUrl = fileUrls[1];
     final String drumsUrl = fileUrls[2];
@@ -100,15 +97,15 @@ class _MuteInstState extends State<MuteInst> with SingleTickerProviderStateMixin
       filePaths.add(vocalFilePath);
       filePaths.add(otherFilePath);
 
-      final response1 = await downloadFile(vocalUrl, vocalFilePath);
+      final response1 = await _downloadFile(vocalUrl, vocalFilePath);
       setState(() {totalProgress += 0.2;});
-      final response2 = await downloadFile(pianoUrl, pianoFilePath);
+      final response2 = await _downloadFile(pianoUrl, pianoFilePath);
       setState(() {totalProgress += 0.2;});
-      final response3 = await downloadFile(drumsUrl, drumFilePath);
+      final response3 = await _downloadFile(drumsUrl, drumFilePath);
       setState(() {totalProgress += 0.2;});
-      final response4 = await downloadFile(otherUrl, otherFilePath);
+      final response4 = await _downloadFile(otherUrl, otherFilePath);
       setState(() {totalProgress += 0.2;});
-      final response5 = await downloadFile(bassUrl, bassFilePath);
+      final response5 = await _downloadFile(bassUrl, bassFilePath);
 
       if (response1.statusCode==200 && response2.statusCode==200 && response3.statusCode==200 && response4.statusCode==200 && response5.statusCode==200) {
         setState(() {
@@ -120,7 +117,7 @@ class _MuteInstState extends State<MuteInst> with SingleTickerProviderStateMixin
     }
   }
 
-  Future<Response> downloadFile(String fileUrl, String path) async {
+  Future<Response> _downloadFile(String fileUrl, String path) async {
     print(path);
     // 파일 다운로드
     final response = await _dio.download('$url/download?file_path=$fileUrl', path,
@@ -301,17 +298,17 @@ class _MuteInstState extends State<MuteInst> with SingleTickerProviderStateMixin
           child: Column(
             children: [
               Padding(
-                padding: EdgeInsets.symmetric(vertical: titlePaddingSize(screenWidth)),
+                padding: EdgeInsets.symmetric(vertical: titlePaddingSize(context)),
                 child: Align(
                     alignment: Alignment.centerLeft,
-                    child: Text("악기 소리 뮤트",style: semiBold(fontSize1(screenWidth)),)
+                    child: Text("악기 소리 뮤트",style: semiBold(fontSize1(context)),)
                 ),
               ),
               Expanded(
                   child: Container(
                     decoration: gbBox(1),
                     child: Padding(
-                      padding: EdgeInsets.only(top: composePaddingSize(screenWidth), left: menuPaddingSize(screenWidth), right: menuPaddingSize(screenWidth)),
+                      padding: EdgeInsets.only(top: composePaddingSize(context), left: menuPaddingSize(context), right: menuPaddingSize(context)),
                       child: Column(
                         children: [
                           Row(
@@ -319,7 +316,7 @@ class _MuteInstState extends State<MuteInst> with SingleTickerProviderStateMixin
                             children: [
                               InkWell(
                                 onTap: () => _pickFile(),
-                                  child: Image.asset("assets/images/browse.png", width: 50,)
+                                  child: Image.asset("assets/images/browse.png", width: screenWidth*0.039,)
                               ),
                               Expanded(
                                 child: Padding(
@@ -331,9 +328,9 @@ class _MuteInstState extends State<MuteInst> with SingleTickerProviderStateMixin
                                       child: Align(
                                         alignment: Alignment.centerLeft,
                                           child: Padding(
-                                            padding: EdgeInsets.symmetric(vertical: composeButtonPaddingV(screenWidth),horizontal: composeButtonPaddingH(screenWidth)),
+                                            padding: EdgeInsets.symmetric(vertical: composeButtonPaddingV(context),horizontal: composeButtonPaddingH(context)),
                                             child: Text(!fileReady ? "여기를 눌러 음원을 불러오세요!":_localFilePath.split('/').last, style: TextStyle(
-                                                fontSize: fontSize3(screenWidth),
+                                                fontSize: fontSize3(context),
                                                 fontWeight: FontWeight.w400,
                                                 color: !fileReady ? Color(0xffBDBDBD):Colors.black),),
                                           )
@@ -353,7 +350,7 @@ class _MuteInstState extends State<MuteInst> with SingleTickerProviderStateMixin
                                       });
                                     }
                                   },
-                                  child: startButton(screenWidth, fileReady, "분석 시작"),
+                                  child: startButton(context, fileReady, "분석 시작"),
                                 ),
                               )
                             ],
@@ -389,7 +386,7 @@ class _MuteInstState extends State<MuteInst> with SingleTickerProviderStateMixin
                           ),
                           Align(
                             alignment: Alignment.bottomLeft,
-                              child: Text("${_formatDuration(_position)} / ${_formatDuration(_duration)}", style: normal(fontSize3(screenWidth)-5),)
+                              child: Text("${_formatDuration(_position)} / ${_formatDuration(_duration)}", style: normal(fontSize3(context)-5),)
                           ),
                           SliderTheme(
                             data: SliderThemeData(
@@ -431,17 +428,16 @@ class _MuteInstState extends State<MuteInst> with SingleTickerProviderStateMixin
             turns: _animationController,
             child: Image.asset("assets/images/loading.png", width: 100,),
           ),
-          Text("음원을 분석중이에요...${(tempProgress*100).toStringAsFixed(0)}%",style: semiBold(fontSize3(MediaQuery.of(context).size.width)),textAlign: TextAlign.center,)
+          Text("음원을 분석중이에요...${(tempProgress*100).toStringAsFixed(0)}%",style: semiBold(fontSize3(context)),textAlign: TextAlign.center,)
         ],
       ),
     );
   }
   
   Widget menus() {
-    var screenWidth = MediaQuery.of(context).size.width;
     return Expanded(
         child: Padding(
-          padding: EdgeInsets.symmetric(vertical: menuPaddingSize(screenWidth)),
+          padding: EdgeInsets.symmetric(vertical: menuPaddingSize(context)),
           child: Row(
             children: [
               Expanded(
@@ -453,11 +449,11 @@ class _MuteInstState extends State<MuteInst> with SingleTickerProviderStateMixin
                           child: Container(
                               decoration:gbBox(1),
                               child: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: menuPaddingSize(screenWidth)+10),
+                                padding: EdgeInsets.symmetric(horizontal: menuPaddingSize(context)+10),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text("베이스 기타", style: semiBold(fontSize2(screenWidth)-5),),
+                                    Text("베이스 기타", style: semiBold(fontSize2(context)-5),),
                                     CustomSwitch(onCheckChange: (bool isShow) {
                                       setState(() {
                                         instChecked[0] = isShow;
@@ -469,16 +465,16 @@ class _MuteInstState extends State<MuteInst> with SingleTickerProviderStateMixin
                               )
                           )
                       ),
-                      SizedBox(height: menuGap(screenWidth),),
+                      SizedBox(height: menuGap(context),),
                       Expanded(
                           child: Container(
                               decoration:gbBox(1),
                               child: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: menuPaddingSize(screenWidth)+10),
+                                padding: EdgeInsets.symmetric(horizontal: menuPaddingSize(context)+10),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text("드럼", style: semiBold(fontSize2(screenWidth)-5),),
+                                    Text("드럼", style: semiBold(fontSize2(context)-5),),
                                     CustomSwitch(
                                         onCheckChange: (bool isShow) {
                                           setState(() {
@@ -492,16 +488,16 @@ class _MuteInstState extends State<MuteInst> with SingleTickerProviderStateMixin
                               )
                           )
                       ),
-                      SizedBox(height: menuGap(screenWidth),),
+                      SizedBox(height: menuGap(context),),
                       Expanded(
                           child: Container(
                               decoration:gbBox(1),
                               child: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: menuPaddingSize(screenWidth)+10),
+                                padding: EdgeInsets.symmetric(horizontal: menuPaddingSize(context)+10),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text("피아노", style: semiBold(fontSize2(screenWidth)-5),),
+                                    Text("피아노", style: semiBold(fontSize2(context)-5),),
                                     CustomSwitch(
                                         onCheckChange: (bool isShow) {
                                           setState(() {
@@ -519,7 +515,7 @@ class _MuteInstState extends State<MuteInst> with SingleTickerProviderStateMixin
                   ),
                 ),
               ),
-              VerticalDivider(width: menuGap(screenWidth)*2,),
+              VerticalDivider(width: menuGap(context)*2,),
               Expanded(
                 child: Visibility(
                   visible: analyseDone,
@@ -529,11 +525,11 @@ class _MuteInstState extends State<MuteInst> with SingleTickerProviderStateMixin
                           child: Container(
                               decoration:gbBox(1),
                               child: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: menuPaddingSize(screenWidth)+10),
+                                padding: EdgeInsets.symmetric(horizontal: menuPaddingSize(context)+10),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text("보컬", style: semiBold(fontSize2(screenWidth)-5),),
+                                    Text("보컬", style: semiBold(fontSize2(context)-5),),
                                     CustomSwitch(
                                         onCheckChange: (bool isShow) {
                                           setState(() {
@@ -547,16 +543,16 @@ class _MuteInstState extends State<MuteInst> with SingleTickerProviderStateMixin
                               )
                           )
                       ),
-                      SizedBox(height: menuGap(screenWidth),),
+                      SizedBox(height: menuGap(context),),
                       Expanded(
                           child: Container(
                               decoration:gbBox(1),
                               child: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: menuPaddingSize(screenWidth)+10),
+                                padding: EdgeInsets.symmetric(horizontal: menuPaddingSize(context)+10),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text("기타 등등", style: semiBold(fontSize2(screenWidth)-5),),
+                                    Text("기타 등등", style: semiBold(fontSize2(context)-5),),
                                     CustomSwitch(
                                         onCheckChange: (bool isShow) {
                                           setState(() {
@@ -570,7 +566,7 @@ class _MuteInstState extends State<MuteInst> with SingleTickerProviderStateMixin
                               )
                           )
                       ),
-                      SizedBox(height: menuGap(screenWidth),),
+                      SizedBox(height: menuGap(context),),
                       Expanded(child: Container()),
                     ],
                   ),

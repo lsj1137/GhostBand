@@ -17,21 +17,22 @@ class _AiComposeState extends State<AiCompose> {
   final AttributeController attributeController = Get.put(AttributeController());
 
   bool composeReady = false;
-  late List<double> containerHeight = [MediaQuery.of(context).size.height*0.45, 0, 0];
+  late List<double> containerHeight = [MediaQuery.of(context).size.height*0.5, 0, 0];
   int currentQuestion = 0;
-  List<String> genre2 = ["new_age", "electronic", "rap", "religious", "international", "easy listening", "avant-garde", "RnB", "Latin", "children", "jazz", "classical", "comedy", "pop", "reggae", "stage", "folk", "blues", "vocal", "holiday", "country", "symphony"];
-  List<String> genre = ["rock", "hiphop", "jazz", "rnb", "reggae"];
+  List<String> genre = ["pop", "rnb", "rap", "jazz", "blues", "electronic", "folk", "reggae", "country", "new_age", "latin", "religious", "classic", "children"];
   List<String> instruments = ["guitar", "bass_guitar", "keyboard", "drum", "synth", "classic_guitar", "piano", "trumpet", "sax", "violin", "cello", "organ"];
   List<String> kInstName = ["일렉 기타", "베이스 기타", "키보드", "드럼", "신디사이저", "클래식 기타", "피아노", "트럼펫", "색소폰", "바이올린", "첼로", "오르간"];
-  List<String> kGenreName = ["락(Rock)", "힙합(Hiphop)", "재즈(Jazz)", "알앤비(Rnb)", "래게(Reggae)"];
+  List<String> kGenreName = ["팝", "알앤비", "랩", "재즈", "블루스", "일렉트로닉", "포크", "레게", "컨츄리", "뉴에이지", "라틴", "종교음악", "클래식", "동요" ];
   List<String> timeSignature = ["4/4", "2/4", "3/4", "1/4", "6/8", "3/8", "other tempos"];
   List<String> bpms = ["천천히(<=76BPM)", "보통 빠르기로(76-120BPM)", "빠르게(>=120BPM)"];
+  List<String> key = ['Major(장조)', 'Minor(단조)'];
 
   int selectedGenre = -1;
   List<bool> selectedInst = [false, false, false, false, false, false, false, false, false, false, false, false];
   String selectedGenreString = "";
   String selectedInstString = "";
   String selectedRhythmString = "";
+  String selectedKey = "";
   int selectedTimeSig = -1;
   int selectedBpm = -1;
   bool bpmSet = false;
@@ -44,7 +45,7 @@ class _AiComposeState extends State<AiCompose> {
       currentQuestion = i;
       for (var j=0; j<containerHeight.length; j++) {
         if (j==i) {
-          containerHeight[j] = MediaQuery.of(context).size.height*0.45;
+          containerHeight[j] = MediaQuery.of(context).size.height*0.5;
         } else {
           containerHeight[j] = 0;
         }
@@ -64,14 +65,15 @@ class _AiComposeState extends State<AiCompose> {
     });
   }
 
-  void _setBpm (int i, int j) {
-    if (i==-1 || j==-1) {
+  void _setBpm (int i, int j, String s) {
+    if (i==-1 || j==-1 || s=='') {
       return;
     }
     setState(() {
       attributeController.signature = "${timeSignature[i]} 박자";
       attributeController.bpm = bpms[j];
-      selectedRhythmString = "> ${timeSignature[i]} 박자 | ${bpms[j]}";
+      attributeController.key = s;
+      selectedRhythmString = "> $s _ ${timeSignature[i]} 박자 _ ${bpms[j]}";
     });
     bpmSet = true;
     isComposeReady();
@@ -113,7 +115,7 @@ class _AiComposeState extends State<AiCompose> {
     "playtime": "60",
     "bars": "16",
     "pitch_range": "5",
-    "key": "C major",
+    "key": selectedKey.split('(').first,
     "tempo": bpm,
     "current_time": currentTime};
   }
@@ -135,61 +137,61 @@ class _AiComposeState extends State<AiCompose> {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Container(
-          height: screenHeight,
-          width: screenWidth,
-          decoration: const BoxDecoration(
-            image: DecorationImage(image: AssetImage("assets/images/background_image.png"),fit: BoxFit.fitWidth,alignment: Alignment.topCenter),
+      body: Container(
+        height: screenHeight,
+        width: screenWidth,
+        decoration: const BoxDecoration(
+          image: DecorationImage(image: AssetImage("assets/images/background_image.png"),fit: BoxFit.fitWidth,alignment: Alignment.topCenter),
+        ),
+        child: Padding(
+          padding: EdgeInsets.only(
+            top: 20,
+            left: screenWidth*0.05,
+            right: screenWidth*0.05
           ),
-          child: Padding(
-            padding: EdgeInsets.only(
-              top: 20,
-              left: screenWidth*0.05,
-              right: screenWidth*0.05
-            ),
-            child: Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: titlePaddingSize(screenWidth)),
-                  child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text("AI 작곡",style: semiBold(fontSize1(screenWidth)),)
-                  ),
+          child: Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: titlePaddingSize(context)),
+                child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text("AI 작곡",style: semiBold(fontSize1(context)),)
                 ),
-                Expanded(
-                    child: Container(
-                      decoration: gbBox(1),
-                      child: Padding(
-                        padding: EdgeInsets.only(top: composePaddingSize(screenWidth), left: menuPaddingSize(screenWidth), right: menuPaddingSize(screenWidth)),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text("원하시는 느낌의 새로운 곡을 만들어볼게요!",style: semiBold(fontSize2(screenWidth)),),
-                                InkWell(
-                                  onTap: (){
-                                    if (composeReady) {
-                                      sendingData = optionsToJson();
-                                      attributeController.sendingData = sendingData;
-                                      Navigator.of(context).pushReplacement(
-                                        MaterialPageRoute(builder: (
-                                            context) => const ComposeIng(),),);
-                                    }
-                                  },
-                                  child: startButton(screenWidth, composeReady, "작곡 시작"),
-                                )
-                              ],
-                            ),
-                            SizedBox(height: composeGap(screenWidth),),
-                            SingleChildScrollView(
+              ),
+              Expanded(
+                  child: Container(
+                    decoration: gbBox(1),
+                    child: Padding(
+                      padding: EdgeInsets.only(top: composePaddingSize(context), left: menuPaddingSize(context), right: menuPaddingSize(context)),
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text("원하시는 느낌의 새로운 곡을 만들어볼게요!",style: semiBold(fontSize2(context)),),
+                              InkWell(
+                                onTap: (){
+                                  if (composeReady) {
+                                    sendingData = optionsToJson();
+                                    attributeController.sendingData = sendingData;
+                                    Navigator.of(context).pushReplacement(
+                                      MaterialPageRoute(builder: (
+                                          context) => const ComposeIng(),),);
+                                  }
+                                },
+                                child: startButton(context, composeReady, "작곡 시작"),
+                              )
+                            ],
+                          ),
+                          SizedBox(height: composeGap(context),),
+                          Expanded(
+                            child: SingleChildScrollView(
                               child: Column(
                                 children: [
 
                                   // 1번 질문
                                   Padding(
-                                    padding: EdgeInsets.symmetric(vertical: composeQuestionGap(screenWidth)),
+                                    padding: EdgeInsets.symmetric(vertical: composeQuestionGap(context)),
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
@@ -201,11 +203,11 @@ class _AiComposeState extends State<AiCompose> {
                                             children: [
                                               qNum(1, selectedGenre==-1),
                                               SizedBox(width: 15,),
-                                              Text("어떤 장르의 곡을 원하시나요?", style: semiBold(fontSize3(screenWidth)),)
+                                              Text("어떤 장르의 곡을 원하시나요?", style: semiBold(fontSize3(context)),)
                                             ],
                                           ),
                                         ),
-                                        Text(selectedGenreString, style: semiBold(fontSize3(screenWidth)),)
+                                        Text(selectedGenreString, style: semiBold(fontSize3(context)),)
                                       ],
                                     ),
                                   ),
@@ -215,7 +217,7 @@ class _AiComposeState extends State<AiCompose> {
                                     duration: Duration(milliseconds: 200),
                                     height: containerHeight[0],
                                     child: Padding(
-                                      padding: EdgeInsets.symmetric(vertical: composeQuestionGap(screenWidth)),
+                                      padding: EdgeInsets.symmetric(vertical: composeQuestionGap(context)),
                                       child: Row(
                                         children: [
                                           SizedBox(width: screenHeight*0.025,),
@@ -236,7 +238,7 @@ class _AiComposeState extends State<AiCompose> {
                                                       decoration: BoxDecoration(
                                                           image: DecorationImage(
                                                               image: AssetImage("assets/images/genre/${genre[index]}.png"),
-                                                            fit: BoxFit.fitWidth
+                                                            fit: BoxFit.cover
                                                           ),
                                                           borderRadius: const BorderRadius.all(Radius.circular(30.0)),
                                                           border: selectedGenre==index ? Border.all(
@@ -263,7 +265,7 @@ class _AiComposeState extends State<AiCompose> {
 
                                   // 2번 질문
                                   Padding(
-                                    padding: EdgeInsets.symmetric(vertical: composeQuestionGap(screenWidth)),
+                                    padding: EdgeInsets.symmetric(vertical: composeQuestionGap(context)),
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
@@ -275,11 +277,11 @@ class _AiComposeState extends State<AiCompose> {
                                             children: [
                                               qNum(2, !bpmSet),
                                               SizedBox(width: 15,),
-                                              Text("어떤 리듬을 원하시나요? (박자, BPM)", style: semiBold(fontSize3(screenWidth)),)
+                                              Text("어떤 분위기를 원하시나요? (Key, 박자, BPM)", style: semiBold(fontSize3(context)),)
                                             ],
                                           ),
                                         ),
-                                        Text(selectedRhythmString, style: semiBold(fontSize3(screenWidth)),)
+                                        Text(selectedRhythmString, style: semiBold(fontSize3(context)),)
                                       ],
                                     ),
                                   ),
@@ -297,7 +299,56 @@ class _AiComposeState extends State<AiCompose> {
                                           child: Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
-                                              Flexible(child: Text("·  박자", style: semiBold(fontSize3(screenWidth)),)),
+
+                                              Flexible(child: Text("▶  Key", style: semiBold(fontSize3(context)),)),
+                                              Flexible(
+                                                child: Row(
+                                                  children: [
+                                                    Container(
+                                                      height: 60,
+                                                      child: ListView.builder(
+                                                          scrollDirection: Axis.horizontal,
+                                                          shrinkWrap: true,
+                                                          itemCount: key.length,
+                                                          itemBuilder: (context, index) {
+                                                            return InkWell(
+                                                              onTap: (){
+                                                                setState(() {
+                                                                  selectedKey = key[index];
+                                                                });
+                                                                _setBpm(selectedTimeSig, selectedBpm, selectedKey);
+                                                              },
+                                                              child: Row(
+                                                                children: [
+                                                                  Padding(
+                                                                    padding: EdgeInsets.symmetric(
+                                                                        horizontal: composeGap(context),
+                                                                        vertical: composeGap(context)
+                                                                    ),
+                                                                    child: Container(
+                                                                      width: MediaQuery.of(context).size.height*0.02,
+                                                                      height: MediaQuery.of(context).size.height*0.02,
+                                                                      decoration: key[index]!=selectedKey ? questionNum() :
+                                                                      BoxDecoration(
+                                                                          borderRadius: const BorderRadius.all(Radius.circular(50.0)),
+                                                                          color: gbBlue
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  Padding(
+                                                                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                                                    child: Text(key[index],style: semiBold(fontSize3(context)),),
+                                                                  )
+                                                                ],
+                                                              ),
+                                                            );
+                                                          }),
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                              SizedBox(height: 10,),
+                                              Flexible(child: Text("▶  박자", style: semiBold(fontSize3(context)),)),
                                               Flexible(
                                                 child: Row(
                                                   children: [
@@ -315,14 +366,14 @@ class _AiComposeState extends State<AiCompose> {
                                                                   setState(() {
                                                                     selectedTimeSig = index;
                                                                   });
-                                                                  _setBpm(selectedTimeSig, selectedBpm);
+                                                                  _setBpm(selectedTimeSig, selectedBpm, selectedKey);
                                                                 },
                                                                 child: Row(
                                                                   children: [
                                                                     Padding(
                                                                       padding: EdgeInsets.symmetric(
-                                                                          horizontal: composeGap(MediaQuery.of(context).size.width),
-                                                                          vertical: composeGap(MediaQuery.of(context).size.width)
+                                                                          horizontal: composeGap(context),
+                                                                          vertical: composeGap(context)
                                                                       ),
                                                                       child: Container(
                                                                         width: MediaQuery.of(context).size.height*0.02,
@@ -334,7 +385,10 @@ class _AiComposeState extends State<AiCompose> {
                                                                         ),
                                                                       ),
                                                                     ),
-                                                                    Text(index!=6 ? "${timeSignature[index]}박자" : "그 외",style: semiBold(fontSize3(MediaQuery.of(context).size.width)),)
+                                                                    Padding(
+                                                                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                                                      child: Text(index!=6 ? "${timeSignature[index]}박자" : "그 외",style: semiBold(fontSize3(context)),),
+                                                                    )
                                                                   ],
                                                                 ),
                                                               ),
@@ -345,7 +399,7 @@ class _AiComposeState extends State<AiCompose> {
                                                 ),
                                               ),
                                               SizedBox(height: 10,),
-                                              Flexible(child: Text("·  BPM", style: semiBold(fontSize3(screenWidth)),)),
+                                              Flexible(child: Text("▶  BPM", style: semiBold(fontSize3(context)),)),
                                               Flexible(
                                                 child: Row(
                                                   children: [
@@ -361,14 +415,14 @@ class _AiComposeState extends State<AiCompose> {
                                                                 setState(() {
                                                                   selectedBpm = index;
                                                                 });
-                                                                _setBpm(selectedTimeSig, selectedBpm);
+                                                                _setBpm(selectedTimeSig, selectedBpm, selectedKey);
                                                               },
                                                               child: Row(
                                                                 children: [
                                                                   Padding(
                                                                     padding: EdgeInsets.symmetric(
-                                                                        horizontal: composeGap(MediaQuery.of(context).size.width),
-                                                                        vertical: composeGap(MediaQuery.of(context).size.width)
+                                                                        horizontal: composeGap(context),
+                                                                        vertical: composeGap(context)
                                                                     ),
                                                                     child: Container(
                                                                       width: MediaQuery.of(context).size.height*0.02,
@@ -380,7 +434,10 @@ class _AiComposeState extends State<AiCompose> {
                                                                       ),
                                                                     ),
                                                                   ),
-                                                                  Text(bpms[index],style: semiBold(fontSize3(MediaQuery.of(context).size.width)),)
+                                                                  Padding(
+                                                                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                                                    child: Text(bpms[index],style: semiBold(fontSize3(context)),),
+                                                                  )
                                                                 ],
                                                               ),
                                                             );
@@ -398,7 +455,7 @@ class _AiComposeState extends State<AiCompose> {
 
                                   // 3번 질문
                                   Padding(
-                                    padding: EdgeInsets.symmetric(vertical: composeQuestionGap(screenWidth)),
+                                    padding: EdgeInsets.symmetric(vertical: composeQuestionGap(context)),
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
@@ -410,11 +467,18 @@ class _AiComposeState extends State<AiCompose> {
                                             children: [
                                               qNum(3, !selectedInst.contains(true)),
                                               SizedBox(width: 15,),
-                                              Text("어떤 악기로 만들까요?", style: semiBold(fontSize3(screenWidth)),)
+                                              Text("어떤 악기로 만들까요?", style: semiBold(fontSize3(context)),)
                                             ],
                                           ),
                                         ),
-                                        Text(selectedInstString, style: semiBold(fontSize3(screenWidth)),)
+                                        Flexible(
+                                          child: SingleChildScrollView(
+                                            scrollDirection: Axis.horizontal,
+                                              child: Align(
+                                              alignment: Alignment.centerRight,
+                                              child: Text(selectedInstString, style: semiBold(fontSize3(context)),))
+                                          ),
+                                        )
                                       ],
                                     ),
                                   ),
@@ -442,14 +506,14 @@ class _AiComposeState extends State<AiCompose> {
                                 ],
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    )
-                ),
-                SizedBox(height: menuPaddingSize(screenWidth),)
-              ],
-            ),
+                    ),
+                  )
+              ),
+              SizedBox(height: menuPaddingSize(context),)
+            ],
           ),
         ),
       ),
@@ -469,8 +533,8 @@ class _AiComposeState extends State<AiCompose> {
       ),
       child: Align(
           alignment: Alignment.center,
-          child: Text(notSelected ? "$i" : "√",
-            style:notSelected ? semiBold(fontSize4(MediaQuery.of(context).size.width)) : TextStyle(color: Colors.white),
+          child: Text("$i",
+            style:notSelected ? semiBold(fontSize4(context)) : TextStyle(color: Colors.white),
           )
       ),
     );
@@ -498,18 +562,18 @@ class _AiComposeState extends State<AiCompose> {
                           image: AssetImage("assets/images/instruments/${instruments[ind*2+startInd]}.png"),
                           fit: BoxFit.cover,
                         ),
-                        borderRadius: const BorderRadius.all(Radius.circular(30.0)),
+                        borderRadius: BorderRadius.all(Radius.circular(menuPaddingSize(context))),
                         border: Border.all(
                             color: const Color(0xFFE4E4E4),
                             width: 1
                         )
                     ),
-                    width: 300,
+                    width: MediaQuery.of(context).size.width*0.22,
                     child: Stack(
                       children: [
                         Container(
                           decoration: BoxDecoration(
-                            borderRadius: const BorderRadius.all(Radius.circular(30.0)),
+                            borderRadius: BorderRadius.all(Radius.circular(menuPaddingSize(context))),
                             color: Color(0xffffffff).withOpacity(0.6)
                           ),
                         ),
@@ -517,8 +581,8 @@ class _AiComposeState extends State<AiCompose> {
                           children: [
                             Padding(
                               padding: EdgeInsets.symmetric(
-                                  horizontal: composeGap(MediaQuery.of(context).size.width),
-                                  vertical: composeGap(MediaQuery.of(context).size.width)
+                                  horizontal: composeButtonPaddingH(context),
+                                  vertical: composeButtonPaddingH(context)
                               ),
                               child: Container(
                                 width: MediaQuery.of(context).size.height*0.02,
@@ -530,7 +594,7 @@ class _AiComposeState extends State<AiCompose> {
                                 ),
                               ),
                             ),
-                            Text(kInstName[ind*2+startInd],style: semiBold(fontSize3(MediaQuery.of(context).size.width)),)
+                            Text(kInstName[ind*2+startInd],style: semiBold(fontSize3(context)),)
                           ],
                         ),
                       ],

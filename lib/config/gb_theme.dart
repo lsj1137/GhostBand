@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-double fontSize1(double width){
+double fontSize1(BuildContext context){
+  double width = MediaQuery.of(context).size.width;
   if (width > 1000){
     return 40;
   } else {
@@ -8,7 +9,8 @@ double fontSize1(double width){
   }
 }
 
-double fontSize2(double width){
+double fontSize2(BuildContext context){
+  double width = MediaQuery.of(context).size.width;
   if (width > 1000){
     return 30;
   } else {
@@ -16,7 +18,8 @@ double fontSize2(double width){
   }
 }
 
-double fontSize3(double width){
+double fontSize3(BuildContext context){
+  double width = MediaQuery.of(context).size.width;
   if (width > 1000){
     return 20;
   } else {
@@ -24,14 +27,27 @@ double fontSize3(double width){
   }
 }
 
-double fontSize4(double width){
+double fontSize4(BuildContext context){
+  double width = MediaQuery.of(context).size.width;
   if (width > 1000){
-    return 16;
+    return 18;
   } else {
-    return 10;
+    return 11;
   }
 }
-double titlePaddingSize(double width) {
+
+double fontSize5(BuildContext context) {
+  double width = MediaQuery.of(context).size.width;
+  if (width > 500){
+    return 16;
+  } else {
+    return 11;
+  }
+}
+
+
+double titlePaddingSize(BuildContext context) {
+  double width = MediaQuery.of(context).size.width;
   if (width > 1000){
     return 18;
   } else {
@@ -39,7 +55,8 @@ double titlePaddingSize(double width) {
   }
 }
 
-double menuPaddingSize(double width) {
+double menuPaddingSize(BuildContext context) {
+  double width = MediaQuery.of(context).size.width;
   if (width > 1000){
     return 30;
   } else {
@@ -47,7 +64,8 @@ double menuPaddingSize(double width) {
   }
 }
 
-double menuGap(double width) {
+double menuGap(BuildContext context) {
+  double width = MediaQuery.of(context).size.width;
   if (width > 1000){
     return 15;
   } else {
@@ -56,7 +74,8 @@ double menuGap(double width) {
 }
 
 
-double composePaddingSize(double width) {
+double composePaddingSize(BuildContext context) {
+  double width = MediaQuery.of(context).size.width;
   if (width > 1000){
     return 30;
   } else {
@@ -64,14 +83,16 @@ double composePaddingSize(double width) {
   }
 }
 
-double composeButtonPaddingH(double width) {
+double composeButtonPaddingH(BuildContext context) {
+  double width = MediaQuery.of(context).size.width;
   if (width > 1000){
     return 15;
   } else {
     return 7;
   }
 }
-double composeButtonPaddingV(double width) {
+double composeButtonPaddingV(BuildContext context) {
+  double width = MediaQuery.of(context).size.width;
   if (width > 1000){
     return 8;
   } else {
@@ -79,7 +100,8 @@ double composeButtonPaddingV(double width) {
   }
 }
 
-double composeGap(double width) {
+double composeGap(BuildContext context) {
+  double width = MediaQuery.of(context).size.width;
   if (width > 1000){
     return 15;
   } else {
@@ -87,7 +109,8 @@ double composeGap(double width) {
   }
 }
 
-double composeQuestionGap(double width) {
+double composeQuestionGap(BuildContext context) {
+  double width = MediaQuery.of(context).size.width;
   if (width > 1000){
     return 10;
   } else {
@@ -117,20 +140,20 @@ BoxDecoration questionNum () {
   );
 }
 
-Widget startButton (double screenWidth, bool condition, String name) {
+Widget startButton (BuildContext context, bool condition, String name) {
   return Container(
     decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         color: condition ? gbBlue : Color(0xffB3B3B3)
     ),
     child: Padding(
-      padding: EdgeInsets.symmetric(vertical: composeButtonPaddingV(screenWidth),horizontal: composeButtonPaddingH(screenWidth)),
+      padding: EdgeInsets.symmetric(vertical: composeButtonPaddingV(context),horizontal: composeButtonPaddingH(context)),
       child: Row(
         children: [
-          Image.asset("assets/images/start.png", width: fontSize3(screenWidth),),
+          Image.asset("assets/images/start.png", width: fontSize3(context),),
           const SizedBox(width: 10,),
           Text(name, style: TextStyle(
-              fontSize: fontSize3(screenWidth),
+              fontSize: fontSize3(context),
               fontWeight: FontWeight.w600,
               color: Colors.white),
           )

@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pdfx/pdfx.dart';
@@ -23,14 +22,14 @@ class _ScoreDetailState extends State<ScoreDetail> {
   final int initialPage = 1;
   late PdfController pdfController;
 
-  TextEditingController _textEditingController = TextEditingController();
+  final TextEditingController _textEditingController = TextEditingController();
 
   bool _isPlaying = false;
   Duration _duration = Duration.zero;
   Duration _position = Duration.zero;
   double _volume = 0.5;
 
-  bool autoTurnPage = false;
+  bool autoTurnPage = true;
 
 
   void _playPause() {
@@ -54,6 +53,16 @@ class _ScoreDetailState extends State<ScoreDetail> {
     return [if (duration.inHours > 0) hours, minutes, seconds].join(':');
   }
 
+
+  void _checkPage() {
+    if (_duration.inSeconds==0 || pdfController.pagesCount==0) {
+      return;
+    }
+    var partition = _duration.inSeconds / pdfController.pagesCount!;
+    var page = _position.inSeconds ~/ partition + 1;
+    if (page > pdfController.pagesCount!) {return;}
+    pdfController.jumpToPage(page);
+  }
 
   @override
   void initState() {
@@ -90,6 +99,9 @@ class _ScoreDetailState extends State<ScoreDetail> {
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
+    if (autoTurnPage) {
+      _checkPage();
+    }
 
     return Scaffold(
       body: Container(
@@ -100,7 +112,7 @@ class _ScoreDetailState extends State<ScoreDetail> {
           children: [
             const SizedBox(height: 30,),
             Padding(
-              padding: const EdgeInsets.all(25.0),
+              padding: EdgeInsets.all(screenWidth*0.011),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -111,8 +123,8 @@ class _ScoreDetailState extends State<ScoreDetail> {
                     child: Row(
                       children: [
                         Image.asset("assets/images/back.png",height: 20,),
-                        SizedBox(width: 10,),
-                        Text("뒤로", style: semiBold(fontSize3(screenHeight)),),
+                        const SizedBox(width: 10,),
+                        Text("뒤로", style: semiBold(fontSize3(context)),),
                       ],
                     ),
                   ),
@@ -131,7 +143,7 @@ class _ScoreDetailState extends State<ScoreDetail> {
                         child: SliderTheme(
                           data: SliderThemeData(
                               trackHeight: 3.0,
-                              trackShape: RectangularSliderTrackShape(),
+                              trackShape: const RectangularSliderTrackShape(),
                               overlayShape: SliderComponentShape.noOverlay,
                               thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8)
                           ),
@@ -147,19 +159,19 @@ class _ScoreDetailState extends State<ScoreDetail> {
                           ),
                         ),
                       ),
-                      Text(_formatDuration(_position),style: normal(fontSize3(MediaQuery.of(context).size.width)),)
+                      Text(_formatDuration(_position),style: normal(fontSize3(context)),)
                     ],
                   ),
                   Row(
                     children: [
-                      Image.asset("assets/images/volume.png",height: 30,),
-                      SizedBox(width: 10,),
+                      Image.asset("assets/images/volume.png",height: screenWidth*0.035,),
+                      const SizedBox(width: 10,),
                       SizedBox(
-                        width: screenWidth*0.13,
+                        width: screenWidth*0.15,
                         child: SliderTheme(
                           data: SliderThemeData(
                               trackHeight: 3.0,
-                              trackShape: RectangularSliderTrackShape(),
+                              trackShape: const RectangularSliderTrackShape(),
                               overlayShape: SliderComponentShape.noOverlay,
                               thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8)
                           ),
@@ -204,7 +216,7 @@ class _ScoreDetailState extends State<ScoreDetail> {
             ),
             Align(
               alignment: Alignment.bottomCenter,
-              child: Container(
+              child: SizedBox(
                 height: screenHeight*0.06,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -222,8 +234,8 @@ class _ScoreDetailState extends State<ScoreDetail> {
                           children: [
                             Padding(
                               padding: EdgeInsets.symmetric(
-                                  horizontal: composeGap(MediaQuery.of(context).size.width),
-                                  vertical: composeGap(MediaQuery.of(context).size.width)
+                                  horizontal: composeGap(context),
+                                  vertical: composeGap(context)
                               ),
                               child: Container(
                                 width: MediaQuery.of(context).size.height*0.015,
@@ -235,14 +247,14 @@ class _ScoreDetailState extends State<ScoreDetail> {
                                 ),
                               ),
                             ),
-                            SizedBox(width: 10,),
-                            Text("악보 자동 넘기기",style: semiBold(fontSize3(MediaQuery.of(context).size.width)),)
+                            const SizedBox(width: 10,),
+                            Text("악보 자동 넘기기",style: semiBold(fontSize5(context)),)
                           ],
                         ),
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.navigate_before),
+                      icon: Icon(Icons.navigate_before,),
                       onPressed: () {
                         pdfController.previousPage(
                           curve: Curves.ease,
@@ -260,11 +272,11 @@ class _ScoreDetailState extends State<ScoreDetail> {
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: SizedBox(
-                                  width: 40,
-                                  height: 40,
+                                  width: screenWidth*0.05,
+                                  height: screenWidth*0.05,
                                   child: TextField(
                                     controller: _textEditingController,
-                                    style: const TextStyle(fontSize: 20),
+                                    style: TextStyle(fontSize: fontSize3(context)),
                                     decoration: const InputDecoration(
                                       contentPadding: EdgeInsets.only(bottom: 10),
                                       border: UnderlineInputBorder(borderSide: BorderSide(color: Colors.black,width: 2)),
@@ -278,16 +290,16 @@ class _ScoreDetailState extends State<ScoreDetail> {
                                   ),
                                 ),
                               ),
-                              const Text('/',style: TextStyle(fontSize: 35, fontWeight: FontWeight.w200),),
+                              Text('/',style: TextStyle(fontSize: fontSize1(context), fontWeight: FontWeight.w200),),
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Container(
-                                  width: 40,
-                                  height: 40,
-                                  decoration: BoxDecoration(
+                                  width: screenWidth*0.05,
+                                  height: screenWidth*0.05,
+                                  decoration: const BoxDecoration(
                                     border:BorderDirectional(bottom: BorderSide()),
                                   ),
-                                  child: Center(child: Text(pagesCount.toString(), style: TextStyle(fontSize: 20),)),
+                                  child: Center(child: Text(pagesCount.toString(), style: TextStyle(fontSize: fontSize3(context)),)),
                                 ),
                               ),
                             ],
@@ -314,4 +326,5 @@ class _ScoreDetailState extends State<ScoreDetail> {
       ),
     );
   }
+
 }

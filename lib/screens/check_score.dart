@@ -244,22 +244,22 @@ class _CheckScoreState extends State<CheckScore> {
           child: Column(
             children: [
               Padding(
-                padding: EdgeInsets.symmetric(vertical: titlePaddingSize(screenWidth)),
+                padding: EdgeInsets.symmetric(vertical: titlePaddingSize(context)),
                 child: Align(
                     alignment: Alignment.centerLeft,
-                    child: Text("악보 확인/재생",style: semiBold(fontSize1(screenWidth)),)
+                    child: Text("악보 확인/재생",style: semiBold(fontSize1(context)),)
                 ),
               ),
               Expanded(
                   child: Container(
                     decoration: gbBox(1),
                     child: Padding(
-                      padding: EdgeInsets.only(top: composePaddingSize(screenWidth), left: menuPaddingSize(screenWidth), right: menuPaddingSize(screenWidth)),
+                      padding: EdgeInsets.only(top: composePaddingSize(context), left: menuPaddingSize(context), right: menuPaddingSize(context)),
                       child: Column(
                         children: [
                           Align(
                             alignment: Alignment.centerLeft,
-                              child: Text("※ 곡 이름을 눌러 악보를 확인할 수 있습니다.",style: semiBold(fontSize3(screenWidth)),)),
+                              child: Text("※ 곡 이름을 눌러 악보를 확인할 수 있습니다.",style: semiBold(fontSize3(context)),)),
                           Expanded(
                             child: Scrollbar(
                               radius: const Radius.circular(2),
@@ -267,20 +267,20 @@ class _CheckScoreState extends State<CheckScore> {
                                 padding: const EdgeInsets.only(top: 20),
                                 child: DataTable(
                                   horizontalMargin: 0,
-                                    headingTextStyle: semiBold(22),
-                                    dataTextStyle: semiBold(fontSize4(screenWidth)),
+                                    headingTextStyle: semiBold(fontSize3(context)),
+                                    dataTextStyle: semiBold(fontSize4(context)),
                                     columnSpacing: 10,
                                     dataRowMinHeight: screenHeight*0.04,
                                     dataRowMaxHeight: screenHeight*0.075,
                                     border: const TableBorder.symmetric(inside: BorderSide(color: Color(0xffdbdbdb)),),
                                     showBottomBorder: true,
                                     columns: [
-                                      DataColumn(label: SizedBox(width: screenWidth*0.05, child: Center(child: Text('순서')))),
-                                      DataColumn(label: SizedBox(width: screenWidth*0.15, child: Center(child: Text('곡 이름')))),
-                                      DataColumn(label: SizedBox(width: screenWidth*0.215, child: Center(child: Text('악기 종류')))),
-                                      DataColumn(label: SizedBox(width: screenWidth*0.11, child: Center(child: Text('생성일시')))),
-                                      DataColumn(label: SizedBox(width: screenWidth*0.18, child: Center(child: Text('재생바')))),
-                                      DataColumn(label: SizedBox(width: screenWidth*0.11, child: Center(child: Text('옵션')))),
+                                      DataColumn(label: SizedBox(width: screenWidth*0.05, child: const Center(child: Text('순서')))),
+                                      DataColumn(label: SizedBox(width: screenWidth*0.15, child: const Center(child: Text('곡 이름')))),
+                                      DataColumn(label: SizedBox(width: screenWidth*0.215, child: const Center(child: Text('악기 종류')))),
+                                      DataColumn(label: SizedBox(width: screenWidth*0.11, child: const Center(child: Text('생성일시')))),
+                                      DataColumn(label: SizedBox(width: screenWidth*0.18, child: const Center(child: Text('재생바')))),
+                                      DataColumn(label: SizedBox(width: screenWidth*0.11, child: const Center(child: Text('옵션')))),
                                     ],
                                     rows: rows
                                 ),
@@ -321,7 +321,7 @@ class _CheckScoreState extends State<CheckScore> {
             },
           ),
         ),
-        Text(_formatDuration(audioPlayerInstances[index][2]),style: semiBold(fontSize3(MediaQuery.of(context).size.width)-5),)
+        Text(_formatDuration(audioPlayerInstances[index][2]),style: semiBold(fontSize3(context)-5),)
       ],
     );
   }
