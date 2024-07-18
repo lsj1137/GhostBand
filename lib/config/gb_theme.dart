@@ -144,7 +144,7 @@ Widget startButton (BuildContext context, bool condition, String name) {
   return Container(
     decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        color: condition ? gbBlue : Color(0xffB3B3B3)
+        color: condition ? gbBlue : const Color(0xffB3B3B3)
     ),
     child: Padding(
       padding: EdgeInsets.symmetric(vertical: composeButtonPaddingV(context),horizontal: composeButtonPaddingH(context)),

@@ -202,7 +202,7 @@ class _AiComposeState extends State<AiCompose> {
                                           child: Row(
                                             children: [
                                               qNum(1, selectedGenre==-1),
-                                              SizedBox(width: 15,),
+                                              const SizedBox(width: 15,),
                                               Text("어떤 장르의 곡을 원하시나요?", style: semiBold(fontSize3(context)),)
                                             ],
                                           ),
@@ -214,14 +214,14 @@ class _AiComposeState extends State<AiCompose> {
 
                                   // 1번 질문 내용
                                   AnimatedContainer(
-                                    duration: Duration(milliseconds: 200),
+                                    duration: const Duration(milliseconds: 200),
                                     height: containerHeight[0],
                                     child: Padding(
                                       padding: EdgeInsets.symmetric(vertical: composeQuestionGap(context)),
                                       child: Row(
                                         children: [
                                           SizedBox(width: screenHeight*0.025,),
-                                          VerticalDivider(width: 0,color: Colors.black,thickness: 2,),
+                                          const VerticalDivider(width: 0,color: Colors.black,thickness: 2,),
                                           SizedBox(width: screenHeight*0.025+10,),
                                           Expanded(
                                             child: ListView.builder(
@@ -249,7 +249,7 @@ class _AiComposeState extends State<AiCompose> {
                                                               width: 1
                                                           ),
                                                         boxShadow: selectedGenre==index ? [
-                                                          BoxShadow(offset: Offset(1, 3),blurRadius: 2,color: Colors.black45)
+                                                          const BoxShadow(offset: Offset(1, 3),blurRadius: 2,color: Colors.black45)
                                                         ] : null,
                                                       ),
                                                     ),
@@ -276,7 +276,7 @@ class _AiComposeState extends State<AiCompose> {
                                           child: Row(
                                             children: [
                                               qNum(2, !bpmSet),
-                                              SizedBox(width: 15,),
+                                              const SizedBox(width: 15,),
                                               Text("어떤 분위기를 원하시나요? (Key, 박자, BPM)", style: semiBold(fontSize3(context)),)
                                             ],
                                           ),
@@ -304,7 +304,7 @@ class _AiComposeState extends State<AiCompose> {
                                               Flexible(
                                                 child: Row(
                                                   children: [
-                                                    Container(
+                                                    SizedBox(
                                                       height: 60,
                                                       child: ListView.builder(
                                                           scrollDirection: Axis.horizontal,
@@ -347,7 +347,7 @@ class _AiComposeState extends State<AiCompose> {
                                                   ],
                                                 ),
                                               ),
-                                              SizedBox(height: 10,),
+                                              const SizedBox(height: 10,),
                                               Flexible(child: Text("▶  박자", style: semiBold(fontSize3(context)),)),
                                               Flexible(
                                                 child: Row(
@@ -398,12 +398,12 @@ class _AiComposeState extends State<AiCompose> {
                                                   ],
                                                 ),
                                               ),
-                                              SizedBox(height: 10,),
+                                              const SizedBox(height: 10,),
                                               Flexible(child: Text("▶  BPM", style: semiBold(fontSize3(context)),)),
                                               Flexible(
                                                 child: Row(
                                                   children: [
-                                                    Container(
+                                                    SizedBox(
                                                       height: 60,
                                                       child: ListView.builder(
                                                           scrollDirection: Axis.horizontal,
@@ -466,7 +466,7 @@ class _AiComposeState extends State<AiCompose> {
                                           child: Row(
                                             children: [
                                               qNum(3, !selectedInst.contains(true)),
-                                              SizedBox(width: 15,),
+                                              const SizedBox(width: 15,),
                                               Text("어떤 악기로 만들까요?", style: semiBold(fontSize3(context)),)
                                             ],
                                           ),
@@ -485,12 +485,12 @@ class _AiComposeState extends State<AiCompose> {
 
                                   // 3번 질문 내용
                                   AnimatedContainer(
-                                    duration: Duration(milliseconds: 200),
+                                    duration: const Duration(milliseconds: 200),
                                     height: containerHeight[2],
                                     child: Row(
                                       children: [
                                         SizedBox(width: screenHeight*0.025,),
-                                        VerticalDivider(width: 0,color: Colors.black,thickness: 2,),
+                                        const VerticalDivider(width: 0,color: Colors.black,thickness: 2,),
                                         SizedBox(width: screenHeight*0.025+10,),
                                         Expanded(
                                           child: Column(
@@ -534,7 +534,7 @@ class _AiComposeState extends State<AiCompose> {
       child: Align(
           alignment: Alignment.center,
           child: Text("$i",
-            style:notSelected ? semiBold(fontSize4(context)) : TextStyle(color: Colors.white),
+            style:notSelected ? semiBold(fontSize4(context)) : const TextStyle(color: Colors.white),
           )
       ),
     );
@@ -574,7 +574,7 @@ class _AiComposeState extends State<AiCompose> {
                         Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.all(Radius.circular(menuPaddingSize(context))),
-                            color: Color(0xffffffff).withOpacity(0.6)
+                            color: const Color(0xffffffff).withOpacity(0.6)
                           ),
                         ),
                         Row(
@@ -589,7 +589,7 @@ class _AiComposeState extends State<AiCompose> {
                                 height: MediaQuery.of(context).size.height*0.02,
                                 decoration: !selectedInst[ind*2+startInd] ? questionNum() :
                                 BoxDecoration(
-                                    borderRadius: BorderRadius.all(Radius.circular(50.0)),
+                                    borderRadius: const BorderRadius.all(Radius.circular(50.0)),
                                     color: gbBlue
                                 ),
                               ),

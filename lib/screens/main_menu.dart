@@ -43,7 +43,7 @@ class _MainMenuState extends State<MainMenu> {
   }
 
   void _startInstAnimation() {
-    _instTimer = Timer.periodic(Duration(milliseconds: 900), (timer) {
+    _instTimer = Timer.periodic(const Duration(milliseconds: 900), (timer) {
       setState(() {
         _instOpacities[_currentInstIndex] = 0.1;
         _currentInstIndex = (_currentInstIndex + 1) % _instOpacities.length;
@@ -53,7 +53,7 @@ class _MainMenuState extends State<MainMenu> {
   }
 
   void _startNoteAnimation() {
-    _noteTimer = Timer.periodic(Duration(milliseconds: 900), (timer) {
+    _noteTimer = Timer.periodic(const Duration(milliseconds: 900), (timer) {
       setState(() {
         _currentNoteIndex = (_currentNoteIndex + 1) % _noteOpacities.length;
         _noteOpacities[_currentNoteIndex] = 1.0;

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ghost_band/screens/main_menu.dart';
@@ -56,20 +57,30 @@ class _ComposeIngState extends State<ComposeIng> {
     cancelToken = CancelToken();
 
     try {
-      print(data);
+      if (kDebugMode) {
+        print(data);
+      }
       final response = await _dio.post(url, data: data,cancelToken: cancelToken);
-      print('Response status: ${response.statusCode}');
-      print('Response data: ${response.data}');
+      if (kDebugMode) {
+        print('Response status: ${response.statusCode}');
+        print('Response data: ${response.data}');
+      }
       fileUrls = response.data['file_urls'];
       _downloadFile();
     } on DioException catch (e) {
       if (CancelToken.isCancel(e)) {
-        print("Request canceled: $e");
+        if (kDebugMode) {
+          print("Request canceled: $e");
+        }
       } else {
-        print("Error uploading file: $e");
+        if (kDebugMode) {
+          print("Error uploading file: $e");
+        }
       }
     } catch (e) {
-      print("Unexpected Error: $e");
+      if (kDebugMode) {
+        print("Unexpected Error: $e");
+      }
     }
   }
 
@@ -88,16 +99,24 @@ class _ComposeIngState extends State<ComposeIng> {
 
     try {
       final response = await _dio.post(url, data: {}, options: Options(headers: headers,));
-      print('Response status: ${response.statusCode}');
-      print('Response data: ${response.data}');
+      if (kDebugMode) {
+        print('Response status: ${response.statusCode}');
+        print('Response data: ${response.data}');
+      }
     } on DioException catch (e) {
       if (CancelToken.isCancel(e)) {
-        print("Request canceled: $e");
+        if (kDebugMode) {
+          print("Request canceled: $e");
+        }
       } else {
-        print("Error uploading file: $e");
+        if (kDebugMode) {
+          print("Error uploading file: $e");
+        }
       }
     } catch (e) {
-      print("Unexpected Error: $e");
+      if (kDebugMode) {
+        print("Unexpected Error: $e");
+      }
     }
   }
 
@@ -129,11 +148,15 @@ class _ComposeIngState extends State<ComposeIng> {
               tempProgress = received / total / 2;
               progress = max(_counter, tempProgress);
             });
-            print('Midi Download progress: ${(received / total * 100).toStringAsFixed(0)}%');
+            if (kDebugMode) {
+              print('Midi Download progress: ${(received / total * 100).toStringAsFixed(0)}%');
+            }
           }
         },
       );
-      print('Midi File saved to: $midiFilePath');
+      if (kDebugMode) {
+        print('Midi File saved to: $midiFilePath');
+      }
 
       setState(() {
         progress = max(_counter, tempProgress);
@@ -146,11 +169,15 @@ class _ComposeIngState extends State<ComposeIng> {
               tempProgress = 0.5 + received / total / 2;
               progress = max(_counter, tempProgress);
             });
-            print('Score Download progress: ${(received / total * 100).toStringAsFixed(0)}%');
+            if (kDebugMode) {
+              print('Score Download progress: ${(received / total * 100).toStringAsFixed(0)}%');
+            }
           }
         },
       );
-      print('Score File saved to: $scoreFilePath');
+      if (kDebugMode) {
+        print('Score File saved to: $scoreFilePath');
+      }
 
       if (response1.statusCode==200 && response2.statusCode==200) {
         setState(() {
@@ -160,7 +187,9 @@ class _ComposeIngState extends State<ComposeIng> {
         _completeAlert();
       }
     } catch (e) {
-      print('Error: $e');
+      if (kDebugMode) {
+        print('Error: $e');
+      }
     }
   }
 
@@ -303,7 +332,7 @@ class _ComposeIngState extends State<ComposeIng> {
     });
 
 
-    _timer2 = Timer.periodic(Duration(seconds: 1), (timer){
+    _timer2 = Timer.periodic(const Duration(seconds: 1), (timer){
       setState(() {
         if (etaS>0) {
           etaS -= 1;
@@ -319,7 +348,9 @@ class _ComposeIngState extends State<ComposeIng> {
         instIndex.add(i);
       }
     }
-    print(instIndex);
+    if (kDebugMode) {
+      print(instIndex);
+    }
 
     // 만들기 요청 전송
     _sendPostRequest(attributeController.sendingData);
@@ -486,7 +517,7 @@ class _ComposeIngState extends State<ComposeIng> {
                                                                 Container(
                                                                   decoration: BoxDecoration(
                                                                       borderRadius: const BorderRadius.all(Radius.circular(30.0)),
-                                                                      color: Color(0xffffffff).withOpacity(0.6)
+                                                                      color: const Color(0xffffffff).withOpacity(0.6)
                                                                   ),
                                                                 ),
                                                                 Row(
@@ -500,7 +531,7 @@ class _ComposeIngState extends State<ComposeIng> {
                                                                         width: MediaQuery.of(context).size.height*0.02,
                                                                         height: MediaQuery.of(context).size.height*0.02,
                                                                         decoration: BoxDecoration(
-                                                                            borderRadius: BorderRadius.all(Radius.circular(50.0)),
+                                                                            borderRadius: const BorderRadius.all(Radius.circular(50.0)),
                                                                             color: gbBlue
                                                                         ),
                                                                       ),
@@ -536,7 +567,7 @@ class _ComposeIngState extends State<ComposeIng> {
                                     width: screenWidth*0.85,
                                     height: screenHeight*0.02,
                                     decoration: BoxDecoration(
-                                        color: Color(0xffDBDBDB),
+                                        color: const Color(0xffDBDBDB),
                                         borderRadius: BorderRadius.circular(10)
                                     ),
                                   ),

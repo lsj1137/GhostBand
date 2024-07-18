@@ -22,7 +22,7 @@ class MainDrawer extends StatelessWidget {
               title: Text('설정', style: semiBold(fontSize2(context)),),
             ),
           ),
-          Divider(height: 2,color: Color(0xff848484),thickness: 1.5,indent: 15,endIndent: 15,),
+          const Divider(height: 2,color: Color(0xff848484),thickness: 1.5,indent: 15,endIndent: 15,),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: ListTile(
@@ -33,7 +33,7 @@ class MainDrawer extends StatelessWidget {
               title: Text('도움말', style: semiBold(fontSize2(context)),),
             ),
           ),
-          Divider(height: 2,color: Color(0xff848484),thickness: 1.5,indent: 15,endIndent: 15,),
+          const Divider(height: 2,color: Color(0xff848484),thickness: 1.5,indent: 15,endIndent: 15,),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: ListTile(
@@ -44,7 +44,7 @@ class MainDrawer extends StatelessWidget {
               title: Text('정보', style: semiBold(fontSize2(context)),),
             ),
           ),
-          Divider(height: 2,color: Color(0xff848484),thickness: 1.5,indent: 15,endIndent: 15,),
+          const Divider(height: 2,color: Color(0xff848484),thickness: 1.5,indent: 15,endIndent: 15,),
         ],
       ),
     );
@@ -73,7 +73,7 @@ class MainDrawer extends StatelessWidget {
                       alignment: Alignment.topRight,
                       child: IconButton(onPressed: (){
                         Navigator.of(context).pop();
-                      }, icon: Icon(Icons.close_rounded,size: 30,),
+                      }, icon: const Icon(Icons.close_rounded,size: 30,),
                         hoverColor: Colors.transparent,
                         splashColor: Colors.transparent,
                         highlightColor: Colors.transparent,
@@ -147,7 +147,7 @@ class MainDrawer extends StatelessWidget {
                       alignment: Alignment.topRight,
                       child: IconButton(onPressed: (){
                         Navigator.of(context).pop();
-                      }, icon: Icon(Icons.close_rounded,size: 30,),
+                      }, icon: const Icon(Icons.close_rounded,size: 30,),
                         hoverColor: Colors.transparent,
                         splashColor: Colors.transparent,
                         highlightColor: Colors.transparent,

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
@@ -65,13 +66,17 @@ class _MakeScoreState extends State<MakeScore> {
       );
 
       // 업로드 성공 시 처리
-      print("Upload successful: ${response.data}");
+      if (kDebugMode) {
+        print("Upload successful: ${response.data}");
+      }
       // fileUrl = response.data['file_url'];
       // print(fileUrl);
       // _downloadFile(fileUrl);
     } catch (e) {
       // 오류 처리
-      print("Error uploading file: $e");
+      if (kDebugMode) {
+        print("Error uploading file: $e");
+      }
     }
   }
 
@@ -91,16 +96,22 @@ class _MakeScoreState extends State<MakeScore> {
               progress = received / total;
               tempProgress = totalProgress+(progress/5);
             });
-            print('Download progress: ${(progress * 100).toStringAsFixed(0)}%');
+            if (kDebugMode) {
+              print('Download progress: ${(progress * 100).toStringAsFixed(0)}%');
+            }
           }
         },
       );
       setState(() {
         analyseDone = true;
       });
-      print('File saved to: $filePath');
+      if (kDebugMode) {
+        print('File saved to: $filePath');
+      }
     } catch (e) {
-      print("Error : $e");
+      if (kDebugMode) {
+        print("Error : $e");
+      }
     }
   }
 
@@ -112,9 +123,11 @@ class _MakeScoreState extends State<MakeScore> {
       await targetFile.create(recursive: true);
       await sourceFile.copy(targetFile.path);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('원본 파일을 찾을 수 없습니다!')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('원본 파일을 찾을 수 없습니다!')),
+        );
+      }
     }
 
   }
@@ -173,7 +186,7 @@ class _MakeScoreState extends State<MakeScore> {
                                             child: Text(!fileReady ? "여기를 눌러 음원을 불러오세요!":_localFilePath.split('/').last, style: TextStyle(
                                                 fontSize: fontSize3(context),
                                                 fontWeight: FontWeight.w400,
-                                                color: !fileReady ? Color(0xffBDBDBD):Colors.black),),
+                                                color: !fileReady ? const Color(0xffBDBDBD):Colors.black),),
                                           )
                                       ),
                                     ),

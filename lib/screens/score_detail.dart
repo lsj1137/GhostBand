@@ -254,7 +254,7 @@ class _ScoreDetailState extends State<ScoreDetail> {
                       ),
                     ),
                     IconButton(
-                      icon: Icon(Icons.navigate_before,),
+                      icon: const Icon(Icons.navigate_before,),
                       onPressed: () {
                         pdfController.previousPage(
                           curve: Curves.ease,

@@ -16,7 +16,7 @@ class CustomSwitch extends StatefulWidget {
 }
 
 class CustomSwitchState extends State<CustomSwitch> {
-  final duration = Duration(milliseconds: 100);
+  final duration = const Duration(milliseconds: 100);
   final width = 70.0, height = 39.0;
   final ballSize = 35.0, ballPadding = 2.0;
 
@@ -44,7 +44,7 @@ class CustomSwitchState extends State<CustomSwitch> {
           switchColor = gbBlue;
           switchLeft = (width - ballSize) - ballPadding;
         } else {
-          switchColor = Color(0xffe2e2e2);
+          switchColor = const Color(0xffe2e2e2);
           switchLeft = ballPadding;
         }
 

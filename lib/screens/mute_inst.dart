@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:path_provider/path_provider.dart';
@@ -58,14 +59,20 @@ class _MuteInstState extends State<MuteInst> with SingleTickerProviderStateMixin
       );
 
       // 업로드 성공 시 처리
-      print("Upload successful: ${response.data}");
+      if (kDebugMode) {
+        print("Upload successful: ${response.data}");
+      }
       fileUrls = response.data['file_urls'];
-      print(fileUrls);
+      if (kDebugMode) {
+        print(fileUrls);
+      }
       _analyseFile();
       return response.statusCode.toString();
     } catch (e) {
       // 오류 처리
-      print("Error uploading file: $e");
+      if (kDebugMode) {
+        print("Error uploading file: $e");
+      }
       return e.toString();
     }
   }
@@ -113,12 +120,13 @@ class _MuteInstState extends State<MuteInst> with SingleTickerProviderStateMixin
         });
       }
     } catch (e) {
-      print('Error: $e');
+      if (kDebugMode) {
+        print('Error: $e');
+      }
     }
   }
 
   Future<Response> _downloadFile(String fileUrl, String path) async {
-    print(path);
     // 파일 다운로드
     final response = await _dio.download('$url/download?file_path=$fileUrl', path,
       onReceiveProgress: (received, total) {
@@ -127,11 +135,15 @@ class _MuteInstState extends State<MuteInst> with SingleTickerProviderStateMixin
             progress = received / total;
             tempProgress = totalProgress+(progress/5);
           });
-          print('${path.split('/').last} Download progress: ${(progress * 100).toStringAsFixed(0)}%');
+          if (kDebugMode) {
+            print('${path.split('/').last} Download progress: ${(progress * 100).toStringAsFixed(0)}%');
+          }
         }
       },
     );
-    print('File saved to: $path');
+    if (kDebugMode) {
+      print('File saved to: $path');
+    }
     return response;
   }
 
@@ -332,7 +344,7 @@ class _MuteInstState extends State<MuteInst> with SingleTickerProviderStateMixin
                                             child: Text(!fileReady ? "여기를 눌러 음원을 불러오세요!":_localFilePath.split('/').last, style: TextStyle(
                                                 fontSize: fontSize3(context),
                                                 fontWeight: FontWeight.w400,
-                                                color: !fileReady ? Color(0xffBDBDBD):Colors.black),),
+                                                color: !fileReady ? const Color(0xffBDBDBD):Colors.black),),
                                           )
                                       ),
                                     ),
@@ -391,7 +403,7 @@ class _MuteInstState extends State<MuteInst> with SingleTickerProviderStateMixin
                           SliderTheme(
                             data: SliderThemeData(
                                 trackHeight: 3.0,
-                                trackShape: RectangularSliderTrackShape(),
+                                trackShape: const RectangularSliderTrackShape(),
                               overlayShape: SliderComponentShape.noOverlay
                             ),
                             child: Slider(

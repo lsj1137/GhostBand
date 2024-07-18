@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:ghost_band/screens/score_detail.dart';
 import 'package:path_provider/path_provider.dart';
@@ -27,7 +28,9 @@ class _CheckScoreState extends State<CheckScore> {
     final directory = await getApplicationDocumentsDirectory();
     final dir = Directory('${directory.path}/compose_results/');
     _files = dir.listSync();
-    print(_files);
+    if (kDebugMode) {
+      print(_files);
+    }
   }
 
   void _readData() {
@@ -93,7 +96,7 @@ class _CheckScoreState extends State<CheckScore> {
             Navigator.of(context).push(MaterialPageRoute(builder: (context) => ScoreDetail(pdfPath: pdfPath, midiPath: midiPath,),),);
           },
           child: Text(fileName,
-            style: TextStyle(decoration: TextDecoration.underline),
+            style: const TextStyle(decoration: TextDecoration.underline),
           ),
         )
     );
@@ -111,7 +114,9 @@ class _CheckScoreState extends State<CheckScore> {
           return const Text('No data');
         } else {
           var data = snapshot.data!.split(',');
-          print(data);
+          if (kDebugMode) {
+            print(data);
+          }
           var instList = [];
           for (var index in data) {
             instList.add(kInstName[int.parse(index)]);
@@ -169,7 +174,6 @@ class _CheckScoreState extends State<CheckScore> {
     // Download 폴더 경로 가져오기
     Directory? downloadDir = await getExternalStorageDirectory();
     var defaultPath = downloadDir?.path.split('/').sublist(0,4).join('/');
-    print(defaultPath);
     String midiDownloadPath = '$defaultPath/Download/${midiPath.split('/').last}';
     String pdfDownloadPath = '$defaultPath/Download/${pdfPath.split('/').last}';
 
@@ -181,13 +185,17 @@ class _CheckScoreState extends State<CheckScore> {
       await sourceFile.copy(targetFile.path);
 
       // 파일 복사 완료 메시지 출력
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Download 폴더에 저장되었습니다!')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Download 폴더에 저장되었습니다!')),
+        );
+      }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('원본 파일을 찾을 수 없습니다!')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('원본 파일을 찾을 수 없습니다!')),
+        );
+      }
     }
     File sourceFile2 = File(pdfPath);
     if (await sourceFile2.exists()) {
@@ -196,13 +204,17 @@ class _CheckScoreState extends State<CheckScore> {
       await sourceFile2.copy(targetFile2.path);
 
       // 파일 복사 완료 메시지 출력
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Download 폴더에 저장되었습니다!')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Download 폴더에 저장되었습니다!')),
+        );
+      }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('원본 파일을 찾을 수 없습니다!')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('원본 파일을 찾을 수 없습니다!')),
+        );
+      }
     }
   }
 
@@ -264,12 +276,12 @@ class _CheckScoreState extends State<CheckScore> {
                             child: Scrollbar(
                               radius: const Radius.circular(2),
                               child: SingleChildScrollView(
-                                padding: const EdgeInsets.only(top: 20),
+                                padding: EdgeInsets.only(top: fontSize3(context)),
                                 child: DataTable(
                                   horizontalMargin: 0,
                                     headingTextStyle: semiBold(fontSize3(context)),
                                     dataTextStyle: semiBold(fontSize4(context)),
-                                    columnSpacing: 10,
+                                    columnSpacing: composeQuestionGap(context),
                                     dataRowMinHeight: screenHeight*0.04,
                                     dataRowMaxHeight: screenHeight*0.075,
                                     border: const TableBorder.symmetric(inside: BorderSide(color: Color(0xffdbdbdb)),),
@@ -303,22 +315,25 @@ class _CheckScoreState extends State<CheckScore> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        SliderTheme(
-          data: SliderThemeData(
-              trackHeight: 3.0,
-              trackShape: RectangularSliderTrackShape(),
-              overlayShape: SliderComponentShape.noOverlay,
-              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6)
-          ),
-          child: Slider(
-            thumbColor: Colors.black,
-            activeColor: Colors.grey, // 재생 된 부분
-            inactiveColor: Colors.grey, // 재생 안된 부분
-            value: audioPlayerInstances[index][2].inSeconds.toDouble(),
-            max: audioPlayerInstances[index][1].inSeconds.toDouble(),
-            onChanged: (value) {
-              _seek(index, value);
-            },
+        SizedBox(
+          width: MediaQuery.of(context).size.width*0.14,
+          child: SliderTheme(
+            data: SliderThemeData(
+                trackHeight: 3.0,
+                trackShape: const RectangularSliderTrackShape(),
+                overlayShape: SliderComponentShape.noOverlay,
+                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6)
+            ),
+            child: Slider(
+              thumbColor: Colors.black,
+              activeColor: Colors.grey, // 재생 된 부분
+              inactiveColor: Colors.grey, // 재생 안된 부분
+              value: audioPlayerInstances[index][2].inSeconds.toDouble(),
+              max: audioPlayerInstances[index][1].inSeconds.toDouble(),
+              onChanged: (value) {
+                _seek(index, value);
+              },
+            ),
           ),
         ),
         Text(_formatDuration(audioPlayerInstances[index][2]),style: semiBold(fontSize3(context)-5),)
@@ -334,13 +349,13 @@ class _CheckScoreState extends State<CheckScore> {
             onTap: () {
               _copyFile(index);
             },
-            child: Image.asset("assets/images/download.png",width: 30,),
+            child: Image.asset("assets/images/download.png",width: menuPaddingSize(context),),
           ),
           InkWell(
             onTap: () {
               _playPause(index);
             },
-            child: Image.asset(audioPlayerInstances[index][0]?"assets/images/pause.png":"assets/images/play.png",width: 20,),
+            child: Image.asset(audioPlayerInstances[index][0]?"assets/images/pause.png":"assets/images/play.png",width: fontSize3(context),),
           ),
         ],
       );
