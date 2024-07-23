@@ -417,8 +417,10 @@ class _MuteInstState extends State<MuteInst> with SingleTickerProviderStateMixin
                               },
                             ),
                           ),
-                          analyseStart && !analyseDone ?
-                          loading() : menus()
+                          Expanded(
+                            child: analyseStart && !analyseDone ?
+                            loading() : menus(),
+                          )
                         ],
                       ),
                     ),
@@ -432,161 +434,157 @@ class _MuteInstState extends State<MuteInst> with SingleTickerProviderStateMixin
   }
 
   Widget loading() {
-    return Expanded(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          RotationTransition(
-            turns: _animationController,
-            child: Image.asset("assets/images/loading.png", width: 100,),
-          ),
-          Text("음원을 분석중이에요...${(tempProgress*100).toStringAsFixed(0)}%",style: semiBold(fontSize3(context)),textAlign: TextAlign.center,)
-        ],
-      ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        RotationTransition(
+          turns: _animationController,
+          child: Image.asset("assets/images/loading.png", width: 100,),
+        ),
+        Text("음원을 분석중이에요...${(tempProgress*100).toStringAsFixed(0)}%",style: semiBold(fontSize3(context)),textAlign: TextAlign.center,)
+      ],
     );
   }
   
   Widget menus() {
-    return Expanded(
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: menuPaddingSize(context)),
-          child: Row(
-            children: [
-              Expanded(
-                child: Visibility(
-                  visible: analyseDone,
-                  child: Column(
-                    children: [
-                      Expanded(
-                          child: Container(
-                              decoration:gbBox(1),
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: menuPaddingSize(context)+10),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text("베이스 기타", style: semiBold(fontSize2(context)-5),),
-                                    CustomSwitch(onCheckChange: (bool isShow) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: menuPaddingSize(context)),
+      child: Row(
+        children: [
+          Expanded(
+            child: Visibility(
+              visible: analyseDone,
+              child: Column(
+                children: [
+                  Expanded(
+                      child: Container(
+                          decoration:gbBox(1),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: menuPaddingSize(context)+10),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("베이스 기타", style: semiBold(fontSize2(context)-5),),
+                                CustomSwitch(onCheckChange: (bool isShow) {
+                                  setState(() {
+                                    instChecked[0] = isShow;
+                                  });
+                                  _applyInst();
+                                },)
+                              ],
+                            ),
+                          )
+                      )
+                  ),
+                  SizedBox(height: menuGap(context),),
+                  Expanded(
+                      child: Container(
+                          decoration:gbBox(1),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: menuPaddingSize(context)+10),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("드럼", style: semiBold(fontSize2(context)-5),),
+                                CustomSwitch(
+                                    onCheckChange: (bool isShow) {
                                       setState(() {
-                                        instChecked[0] = isShow;
+                                        instChecked[1] = isShow;
                                       });
                                       _applyInst();
-                                    },)
-                                  ],
-                                ),
-                              )
+                                    }
+                                )
+                              ],
+                            ),
                           )
-                      ),
-                      SizedBox(height: menuGap(context),),
-                      Expanded(
-                          child: Container(
-                              decoration:gbBox(1),
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: menuPaddingSize(context)+10),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text("드럼", style: semiBold(fontSize2(context)-5),),
-                                    CustomSwitch(
-                                        onCheckChange: (bool isShow) {
-                                          setState(() {
-                                            instChecked[1] = isShow;
-                                          });
-                                          _applyInst();
-                                        }
-                                    )
-                                  ],
-                                ),
-                              )
-                          )
-                      ),
-                      SizedBox(height: menuGap(context),),
-                      Expanded(
-                          child: Container(
-                              decoration:gbBox(1),
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: menuPaddingSize(context)+10),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text("피아노", style: semiBold(fontSize2(context)-5),),
-                                    CustomSwitch(
-                                        onCheckChange: (bool isShow) {
-                                          setState(() {
-                                            instChecked[2] = isShow;
-                                          });
-                                          _applyInst();
-                                        }
-                                    )
-                                  ],
-                                ),
-                              )
-                          )
-                      ),
-                    ],
+                      )
                   ),
-                ),
+                  SizedBox(height: menuGap(context),),
+                  Expanded(
+                      child: Container(
+                          decoration:gbBox(1),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: menuPaddingSize(context)+10),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("피아노", style: semiBold(fontSize2(context)-5),),
+                                CustomSwitch(
+                                    onCheckChange: (bool isShow) {
+                                      setState(() {
+                                        instChecked[2] = isShow;
+                                      });
+                                      _applyInst();
+                                    }
+                                )
+                              ],
+                            ),
+                          )
+                      )
+                  ),
+                ],
               ),
-              VerticalDivider(width: menuGap(context)*2,),
-              Expanded(
-                child: Visibility(
-                  visible: analyseDone,
-                  child: Column(
-                    children: [
-                      Expanded(
-                          child: Container(
-                              decoration:gbBox(1),
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: menuPaddingSize(context)+10),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text("보컬", style: semiBold(fontSize2(context)-5),),
-                                    CustomSwitch(
-                                        onCheckChange: (bool isShow) {
-                                          setState(() {
-                                            instChecked[3] = isShow;
-                                          });
-                                          _applyInst();
-                                        }
-                                    )
-                                  ],
-                                ),
-                              )
-                          )
-                      ),
-                      SizedBox(height: menuGap(context),),
-                      Expanded(
-                          child: Container(
-                              decoration:gbBox(1),
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: menuPaddingSize(context)+10),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text("기타 등등", style: semiBold(fontSize2(context)-5),),
-                                    CustomSwitch(
-                                        onCheckChange: (bool isShow) {
-                                          setState(() {
-                                            instChecked[4] = isShow;
-                                          });
-                                          _applyInst();
-                                        }
-                                    )
-                                  ],
-                                ),
-                              )
-                          )
-                      ),
-                      SizedBox(height: menuGap(context),),
-                      Expanded(child: Container()),
-                    ],
-                  ),
-                ),
-              )
-            ],
+            ),
           ),
-        )
+          VerticalDivider(width: menuGap(context)*2,),
+          Expanded(
+            child: Visibility(
+              visible: analyseDone,
+              child: Column(
+                children: [
+                  Expanded(
+                      child: Container(
+                          decoration:gbBox(1),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: menuPaddingSize(context)+10),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("보컬", style: semiBold(fontSize2(context)-5),),
+                                CustomSwitch(
+                                    onCheckChange: (bool isShow) {
+                                      setState(() {
+                                        instChecked[3] = isShow;
+                                      });
+                                      _applyInst();
+                                    }
+                                )
+                              ],
+                            ),
+                          )
+                      )
+                  ),
+                  SizedBox(height: menuGap(context),),
+                  Expanded(
+                      child: Container(
+                          decoration:gbBox(1),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: menuPaddingSize(context)+10),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("기타 등등", style: semiBold(fontSize2(context)-5),),
+                                CustomSwitch(
+                                    onCheckChange: (bool isShow) {
+                                      setState(() {
+                                        instChecked[4] = isShow;
+                                      });
+                                      _applyInst();
+                                    }
+                                )
+                              ],
+                            ),
+                          )
+                      )
+                  ),
+                  SizedBox(height: menuGap(context),),
+                  Expanded(child: Container()),
+                ],
+              ),
+            ),
+          )
+        ],
+      ),
     );
   }
 }

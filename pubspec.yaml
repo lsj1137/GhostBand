@@ -22,12 +22,7 @@ dependencies:
   pdfx: ^2.6.0
   permission_handler: ^11.3.1
   wakelock_plus: ^1.2.5
-  flutter_midi_pro: ^3.1.3
-  flutter_piano_pro: ^0.5.0
-  tekartik_midi:
-    git:
-      url: https://github.com/tekartik/midi.dart
-      ref: dart3a
+  fluttertoast: ^8.2.6
 
 dev_dependencies:
   flutter_test:
@@ -43,7 +38,6 @@ flutter:
     - assets/images/
     - assets/images/instruments/
     - assets/images/genre/
-    - assets/soundfonts/
 
   fonts:
     - family: Pretendard

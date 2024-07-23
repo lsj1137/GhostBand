@@ -4,8 +4,10 @@ import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:pdfx/pdfx.dart';
 
 import '../config/gb_theme.dart';
 
@@ -16,8 +18,10 @@ class MakeScore extends StatefulWidget {
   State<MakeScore> createState() => _MakeScoreState();
 }
 
-class _MakeScoreState extends State<MakeScore> {
+class _MakeScoreState extends State<MakeScore> with SingleTickerProviderStateMixin {
   final Dio _dio = Dio();
+  late AnimationController _animationController;
+  late PdfController pdfController;
 
   String url = 'http://220.149.232.226:5010';
 
@@ -31,6 +35,8 @@ class _MakeScoreState extends State<MakeScore> {
   bool fileReady = false;
   bool analyseStart = false;
   bool analyseDone = false;
+
+  final int initialPage = 1;
 
   Future<void> _pickFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -57,7 +63,7 @@ class _MakeScoreState extends State<MakeScore> {
     });
 
     try {
-      Response response = await _dio.post('$url/separator', data: formData,
+      Response response = await _dio.post('$url/sheet', data: formData,
         options: Options(
           headers: {
             "Content-Type": "multipart/form-data",
@@ -69,9 +75,8 @@ class _MakeScoreState extends State<MakeScore> {
       if (kDebugMode) {
         print("Upload successful: ${response.data}");
       }
-      // fileUrl = response.data['file_url'];
-      // print(fileUrl);
-      // _downloadFile(fileUrl);
+      var fileUrl = response.data['file_urls'];
+      await _downloadFile(fileUrl);
     } catch (e) {
       // 오류 처리
       if (kDebugMode) {
@@ -102,6 +107,15 @@ class _MakeScoreState extends State<MakeScore> {
           }
         },
       );
+      downloadToast();
+      pdfController = PdfController(
+          document: PdfDocument.openData(File(pdfPath).readAsBytesSync()).whenComplete(() {
+            setState(() {
+              pdfController.pagesCount;
+            });
+          }),
+          initialPage: initialPage
+      );
       setState(() {
         analyseDone = true;
       });
@@ -115,8 +129,19 @@ class _MakeScoreState extends State<MakeScore> {
     }
   }
 
-  Future<void> _copyFile(String source, String dest) async {
+  void downloadToast() {
+    Fluttertoast.showToast(
+        msg: "악보가 저장되었습니다.\n악보 확인/재생 메뉴에서 확인 가능합니다.",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.grey,
+        textColor: Colors.white,
+        fontSize: 16.0
+    );
+  }
 
+  Future<void> _copyFile(String source, String dest) async {
     File sourceFile = File(source);
     if (await sourceFile.exists()) {
       File targetFile = File(dest);
@@ -130,6 +155,21 @@ class _MakeScoreState extends State<MakeScore> {
       }
     }
 
+  }
+
+  @override
+  void initState() {
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
   @override
@@ -174,7 +214,7 @@ class _MakeScoreState extends State<MakeScore> {
                                   child: Image.asset("assets/images/browse.png", width: screenWidth*0.039,)),
                               Expanded(
                                 child: Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: screenWidth*0.03),
+                                  padding: !analyseStart ? EdgeInsets.symmetric(horizontal: screenWidth*0.03) : EdgeInsets.only(left: screenWidth*0.03),
                                   child: InkWell(
                                     onTap: () => _pickFile(),
                                     child: Container(
@@ -196,19 +236,21 @@ class _MakeScoreState extends State<MakeScore> {
                               Visibility(
                                 visible: !analyseStart,
                                 child: InkWell(
-                                  onTap: (){
+                                  onTap: () async {
                                     if (fileReady) {
                                       setState(() {
                                         analyseStart = true;
                                       });
-                                      _uploadFile();
+                                      await _uploadFile();
                                     }
                                   },
                                   child: startButton(context, fileReady, "분석 시작"),
                                 ),
-                              )
+                              ),
                             ],
                           ),
+                          Expanded(child: !analyseStart ? Container() : !analyseDone ?
+                          loading() : pdfViewer())
                         ],
                       ),
                     ),
@@ -220,5 +262,67 @@ class _MakeScoreState extends State<MakeScore> {
       ),
     );
   }
+
+
+  Widget loading() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        RotationTransition(
+          turns: _animationController,
+          child: Image.asset("assets/images/loading.png", width: 100,),
+        ),
+        Text("음원을 분석중이에요...${(tempProgress*100).toStringAsFixed(0)}%",style: semiBold(fontSize3(context)),textAlign: TextAlign.center,)
+      ],
+    );
+  }
+
+  Widget pdfViewer() {
+    var screenWidth = MediaQuery.of(context).size.width;
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: menuPaddingSize(context)),
+      child: Container(
+        width: screenWidth,
+        decoration: gbBox(1),
+        child: Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(30),
+                child: PdfView(
+                  onPageChanged: (page) {setState(() {});},
+                  builders: PdfViewBuilders<DefaultBuilderOptions>(
+                    options: const DefaultBuilderOptions(),
+                    documentLoaderBuilder: (_) =>
+                    const Center(child: CircularProgressIndicator()),
+                    pageLoaderBuilder: (_) =>
+                    const Center(child: CircularProgressIndicator()),
+                  ),
+                  controller: pdfController,
+                ),
+              ),
+            ),
+            Row(
+              children: [
+                SizedBox(
+                  width: screenWidth*0.045,
+                  height: screenWidth*0.045,
+                  child: Center(child: Text(pdfController.page.toString(), style: TextStyle(fontSize: fontSize3(context),color: Colors.black54))),
+                ),
+                Text('/',style: TextStyle(fontSize: fontSize2(context), fontWeight: FontWeight.w200, color: Colors.black54),),
+                SizedBox(
+                  width: screenWidth*0.045,
+                  height: screenWidth*0.045,
+                  child: Center(child: Text(pdfController.pagesCount.toString(), style: TextStyle(fontSize: fontSize3(context),color: Colors.black54),)),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
 }
 

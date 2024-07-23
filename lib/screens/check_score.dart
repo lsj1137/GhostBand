@@ -109,7 +109,7 @@ class _CheckScoreState extends State<CheckScore> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Container();
         } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
+          return const Text('None');
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return const Text('No data');
         } else {
@@ -134,7 +134,7 @@ class _CheckScoreState extends State<CheckScore> {
 
   String changeDateFormat(String s) {
     var origin = s.split('_');
-    var ymd = '${origin[0].substring(0,2)}.${origin[0].substring(2,4)}.${origin[0].substring(4,6)}';
+    var ymd = '${origin[0].substring(2,4)}.${origin[0].substring(4,6)}.${origin[0].substring(6,8)}';
     var hm = '${origin[1].substring(0,2)}:${origin[1].substring(2,4)}';
     return '$ymd $hm';
   }
