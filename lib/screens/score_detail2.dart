@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
@@ -66,33 +67,34 @@ class _ScoreDetail2State extends State<ScoreDetail2> {
   }
 
   void _playPause() {
-    var i = 0;
-    var j = 60;
     if (_isPlaying) {
       //_midiPro.stopNote(channel: i, key: j, sfId: soundfontId);
-      //_audioPlayer.pause();
+      _audioPlayer.pause();
     } else {
       for (MidiTrack t in file.tracks) {
+        var i = 0;
         for (TrackEvent e in t.events) {
           if (e.midiEvent.eventType!=8 && e.midiEvent.eventType!=9) {
             continue;
           }
-          print("==");
-          print(e.deltaTime);
-          print(file.delayToMillis(e.deltaTime).milliseconds);
-          Future.delayed(file.delayToMillis(e.deltaTime).milliseconds);
+          print("==${i++}==");
+          print(file.delayToMillis(e.deltaTime).seconds);
           var command = e.midiEvent.toString().split(' ');
+          print(command);
           var channel = int.parse(command[0].substring(0,1));
           var key = int.parse(command[2]);
           var velocity = int.parse(command[4]);
-          if (e.midiEvent.eventType==9) {
-            _midiPro.playNote(channel: channel, key: key, velocity: velocity, sfId: soundfontId);
-          } else if (e.midiEvent.eventType==8) {
-            _midiPro.stopNote(channel: channel, key: key, sfId: soundfontId);
-          }
+          Timer.periodic(file.delayToMillis(e.deltaTime).seconds, (timer) {
+            if (e.midiEvent.eventType==9) {
+              _midiPro.playNote(channel: channel, key: key, velocity: velocity, sfId: soundfontId);
+            } else if (e.midiEvent.eventType==8) {
+              _midiPro.stopNote(channel: channel, key: key, sfId: soundfontId);
+            }
+            timer.cancel();
+          });
         }
       }
-      //_audioPlayer.play(DeviceFileSource(widget.midiPath));
+      _audioPlayer.play(DeviceFileSource(widget.midiPath));
     }
     setState(() => _isPlaying = !_isPlaying);
   }

@@ -32,6 +32,7 @@ class _MakeScoreState extends State<MakeScore> {
   bool analyseStart = false;
   bool analyseDone = false;
 
+
   Future<void> _pickFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.audio,
@@ -57,7 +58,7 @@ class _MakeScoreState extends State<MakeScore> {
     });
 
     try {
-      Response response = await _dio.post('$url/separator', data: formData,
+      Response response = await _dio.post('$url/sheet', data: formData,
         options: Options(
           headers: {
             "Content-Type": "multipart/form-data",
@@ -65,13 +66,15 @@ class _MakeScoreState extends State<MakeScore> {
         ),
       );
 
+      String fileUrl = "";
       // 업로드 성공 시 처리
       if (kDebugMode) {
         print("Upload successful: ${response.data}");
       }
-      // fileUrl = response.data['file_url'];
-      // print(fileUrl);
-      // _downloadFile(fileUrl);
+      fileUrl = response.data['file_urls'];
+      print(fileUrl);
+      _downloadFile(fileUrl);
+
     } catch (e) {
       // 오류 처리
       if (kDebugMode) {
