@@ -129,6 +129,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.8"
+  cv:
+    dependency: transitive
+    description:
+      name: cv
+      sha256: "36b80f1c2be88afe734c9e4ecd98c637b1b7c36dd9a60faf24843047fa23acef"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.20+1"
+  dart_flutter_team_lints:
+    dependency: transitive
+    description:
+      name: dart_flutter_team_lints
+      sha256: "091ced68bc78ae8002003065486fd052d556903ba6c68a4d47ca574c80e6013f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.1"
   dbus:
     dependency: transitive
     description:
@@ -230,6 +246,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.2"
+  flutter_midi_pro:
+    dependency: "direct main"
+    description:
+      name: flutter_midi_pro
+      sha256: ba53de4f3f2e2a584223b45b20317b959d89aa271c2de450c60eab9287b58ee4
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.1.3"
+  flutter_piano_pro:
+    dependency: "direct main"
+    description:
+      name: flutter_piano_pro
+      sha256: "7e85b2cadbd7a30a9e82d81b9181d6ca4b1a708db1928ed04a569a7129e33618"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.5.1"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
@@ -320,6 +352,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.0"
+  logging:
+    dependency: transitive
+    description:
+      name: logging
+      sha256: "623a88c9594aa774443aa3eb2d41807a48486b5613e67599fb4c41c0ad47c340"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.0"
   matcher:
     dependency: transitive
     description:
@@ -504,6 +544,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.8"
+  pub_semver:
+    dependency: transitive
+    description:
+      name: pub_semver
+      sha256: "40d3ab1bbd474c4c2328c91e3a7df8c6dd629b79ece4c4bd04bee496a224fb0c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.4"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -557,6 +605,33 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.0+1"
+  tekartik_common_utils:
+    dependency: transitive
+    description:
+      path: "."
+      ref: dart3a
+      resolved-ref: "46d4f23127941ee8e74ab09d051261c4e99ce5cc"
+      url: "https://github.com/tekartik/common_utils.dart"
+    source: git
+    version: "0.15.8"
+  tekartik_lints:
+    dependency: transitive
+    description:
+      path: "packages/lints"
+      ref: dart3a
+      resolved-ref: dd36d1615e1bcc04bcfe292534ced099ed598ced
+      url: "https://github.com/tekartik/common.dart"
+    source: git
+    version: "0.4.2"
+  tekartik_midi:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: dart3a
+      resolved-ref: "0ed7b070aed84e5db2725354958b0c528478aa77"
+      url: "https://github.com/tekartik/midi.dart"
+    source: git
+    version: "0.4.1"
   term_glyph:
     dependency: transitive
     description:
