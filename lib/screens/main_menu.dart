@@ -9,6 +9,7 @@ import 'package:ghost_band/screens/make_score.dart';
 import 'package:ghost_band/screens/mute_inst.dart';
 import 'package:ghost_band/widgets/main_drawer.dart';
 
+
 class MainMenu extends StatefulWidget {
   const MainMenu({super.key});
 
