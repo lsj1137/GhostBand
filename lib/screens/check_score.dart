@@ -22,7 +22,7 @@ class _CheckScoreState extends State<CheckScore> {
   List<List<dynamic>> audioPlayerInstances = []; // 0: isPlaying, 1: duration, 2:position, 3: instance
   List<DataRow> rows = [];
 
-  List<String> kInstName = ["일렉 기타", "베이스 기타", "키보드", "드럼", "신디사이저", "클래식 기타", "피아노", "트럼펫", "색소폰", "바이올린", "첼로", "오르간"];
+  List<String> kInstName = ["일렉 기타", "베이스 기타", "키보드", "드럼", "신디사이저", "클래식 기타", "피아노", "트럼펫", "색소폰", "바이올린", "첼로", "오르간", "그 외"];
 
   Future<void> _loadLocalFile() async {
     final directory = await getApplicationDocumentsDirectory();
@@ -93,6 +93,11 @@ class _CheckScoreState extends State<CheckScore> {
     return Center(
         child: InkWell(
           onTap: () {
+            for (int i=0; i<_files.length; i++) {
+              if(audioPlayerInstances[i][0]) {
+                _playPause(i);
+              }
+            }
             Navigator.of(context).push(MaterialPageRoute(builder: (context) => ScoreDetail(pdfPath: pdfPath, midiPath: midiPath,),),);
           },
           child: Text(fileName,
@@ -114,9 +119,6 @@ class _CheckScoreState extends State<CheckScore> {
           return const Text('No data');
         } else {
           var data = snapshot.data!.split(',');
-          if (kDebugMode) {
-            print(data);
-          }
           var instList = [];
           for (var index in data) {
             instList.add(kInstName[int.parse(index)]);
@@ -272,11 +274,11 @@ class _CheckScoreState extends State<CheckScore> {
                           Align(
                             alignment: Alignment.centerLeft,
                               child: Text("※ 곡 이름을 눌러 악보를 확인할 수 있습니다.",style: semiBold(fontSize3(context)),)),
+                          SizedBox(height: screenHeight*0.01),
                           Expanded(
                             child: Scrollbar(
                               radius: const Radius.circular(2),
                               child: SingleChildScrollView(
-                                padding: EdgeInsets.only(top: fontSize3(context)),
                                 child: DataTable(
                                   horizontalMargin: 0,
                                     headingTextStyle: semiBold(fontSize3(context)),
@@ -289,11 +291,12 @@ class _CheckScoreState extends State<CheckScore> {
                                     columns: [
                                       DataColumn(label: SizedBox(width: screenWidth*0.05, child: const Center(child: Text('순서')))),
                                       DataColumn(label: SizedBox(width: screenWidth*0.15, child: const Center(child: Text('곡 이름')))),
-                                      DataColumn(label: SizedBox(width: screenWidth*0.215, child: const Center(child: Text('악기 종류')))),
+                                      DataColumn(label: SizedBox(width: screenWidth*0.21, child: const Center(child: Text('악기 종류')))),
                                       DataColumn(label: SizedBox(width: screenWidth*0.11, child: const Center(child: Text('생성일시')))),
                                       DataColumn(label: SizedBox(width: screenWidth*0.18, child: const Center(child: Text('재생바')))),
                                       DataColumn(label: SizedBox(width: screenWidth*0.11, child: const Center(child: Text('옵션')))),
                                     ],
+                                    headingRowHeight: screenHeight*0.09,
                                     rows: rows
                                 ),
                               ),

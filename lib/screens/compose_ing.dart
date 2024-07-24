@@ -36,8 +36,8 @@ class _ComposeIngState extends State<ComposeIng> {
 
   List<String> genre = ["pop", "rnb", "rap", "jazz", "blues", "electronic", "folk", "reggae", "country", "new_age", "latin", "religious", "classic", "children"];
   List<String> rhythm = ["디스코(DISCO)","고고(GOGO)", "슬로고고(Slow GOGO)", "스윙(SWING)", "락(ROCK)", "슬로락(Slow ROCK)", "탱고(TANGO)", "차차(CHACHA)", "왈츠(WALTZ)", "트롯(TROT)"];
-  List<String> instruments = ["guitar", "bass_guitar", "keyboard", "drum", "synth", "classic_guitar", "piano", "trumpet", "sax", "violin", "cello", "organ"];
-  List<String> kInstName = ["일렉 기타", "베이스 기타", "키보드", "드럼", "신디사이저", "클래식 기타", "피아노", "트럼펫", "색소폰", "바이올린", "첼로", "오르간"];
+  List<String> instruments = ["guitar", "bass_guitar", "keyboard", "drum", "synth", "classic_guitar", "piano", "trumpet", "sax", "violin", "cello", "organ", "ETC"];
+  List<String> kInstName = ["일렉 기타", "베이스 기타", "키보드", "드럼", "신디사이저", "클래식 기타", "피아노", "트럼펫", "색소폰", "바이올린", "첼로", "오르간", "그 외"];
   List<String> kGenreName = ["팝", "알앤비", "랩", "재즈", "블루스", "일렉트로닉", "포크", "레게", "컨츄리", "뉴에이지", "라틴", "종교음악", "클래식", "동요" ];
 
   List<int?> instIndex = [];
@@ -343,7 +343,7 @@ class _ComposeIngState extends State<ComposeIng> {
       });
     });
 
-    for (int i=0; i<instruments.length; i++) {
+    for (int i=0; i<attributeController.instruments.length; i++) {
       if (attributeController.instruments[i]) {
         instIndex.add(i);
       }

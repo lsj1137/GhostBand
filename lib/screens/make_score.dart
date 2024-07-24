@@ -23,6 +23,8 @@ class _MakeScoreState extends State<MakeScore> with SingleTickerProviderStateMix
   late AnimationController _animationController;
   late PdfController pdfController;
 
+  List<String> instruments = ["guitar", "bass_guitar", "keyboard", "drum", "synth", "classic_guitar", "piano", "trumpet", "sax", "violin", "cello", "organ", "ETC"];
+
   String url = 'http://220.149.232.226:5010';
 
   double progress = 0;
@@ -76,7 +78,8 @@ class _MakeScoreState extends State<MakeScore> with SingleTickerProviderStateMix
         print("Upload successful: ${response.data}");
       }
       var fileUrl = response.data['file_urls'];
-      await _downloadFile(fileUrl);
+      var instList = response.data['instruments'];
+      await _downloadFile(fileUrl, instList);
     } catch (e) {
       // 오류 처리
       if (kDebugMode) {
@@ -85,10 +88,12 @@ class _MakeScoreState extends State<MakeScore> with SingleTickerProviderStateMix
     }
   }
 
-  Future<void> _downloadFile(String fileUrl) async {
+  Future<void> _downloadFile(String fileUrl, instList) async {
     final directory = await getApplicationDocumentsDirectory();
     var currentTime = DateFormat('yyyyMMdd_HHmm').format(DateTime.now());
     final filePath = '${directory.path}/compose_results/$currentTime';
+    final metadataPath = '${directory.path}/compose_results/$currentTime/meta.txt';
+    saveMetaData(metadataPath, instList);
     pdfPath = '$filePath/generated_score.pdf';
     final musicFilePath = '$filePath/${_localFilePath.split('/').last}';
     _copyFile(_localFilePath, musicFilePath);
@@ -127,6 +132,18 @@ class _MakeScoreState extends State<MakeScore> with SingleTickerProviderStateMix
         print("Error : $e");
       }
     }
+  }
+
+  Future<void> saveMetaData(String metadataPath, instList) async {
+    final metaFile = File(metadataPath);
+    if (!(await metaFile.parent.exists())) {
+      await metaFile.parent.create(recursive: true);
+    }
+    var instIndex = [];
+    for (var inst in instList) {
+      instIndex.add(instruments.indexOf(inst.toString()));
+    }
+    await metaFile.writeAsString(instIndex.join(','));
   }
 
   void downloadToast() {
@@ -223,7 +240,7 @@ class _MakeScoreState extends State<MakeScore> with SingleTickerProviderStateMix
                                           alignment: Alignment.centerLeft,
                                           child: Padding(
                                             padding: EdgeInsets.symmetric(vertical: composeButtonPaddingV(context),horizontal: composeButtonPaddingH(context)),
-                                            child: Text(!fileReady ? "여기를 눌러 음원을 불러오세요!":_localFilePath.split('/').last, style: TextStyle(
+                                            child: Text(!fileReady ? "여기를 눌러 MIDI 음원을 불러오세요!":_localFilePath.split('/').last, style: TextStyle(
                                                 fontSize: fontSize3(context),
                                                 fontWeight: FontWeight.w400,
                                                 color: !fileReady ? const Color(0xffBDBDBD):Colors.black),),
@@ -272,7 +289,7 @@ class _MakeScoreState extends State<MakeScore> with SingleTickerProviderStateMix
           turns: _animationController,
           child: Image.asset("assets/images/loading.png", width: 100,),
         ),
-        Text("음원을 분석중이에요...${(tempProgress*100).toStringAsFixed(0)}%",style: semiBold(fontSize3(context)),textAlign: TextAlign.center,)
+        Text("음원을 분석중이에요... ${(tempProgress*100).toStringAsFixed(0)}%\n현재는 MIDI 음원만 추출이 가능해요!",style: semiBold(fontSize3(context)),textAlign: TextAlign.center,)
       ],
     );
   }

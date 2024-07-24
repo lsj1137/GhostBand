@@ -20,8 +20,8 @@ class _AiComposeState extends State<AiCompose> {
   late List<double> containerHeight = [MediaQuery.of(context).size.height*0.5, 0, 0];
   int currentQuestion = 0;
   List<String> genre = ["pop", "rnb", "rap", "jazz", "blues", "electronic", "folk", "reggae", "country", "new_age", "latin", "religious", "classic", "children"];
-  List<String> instruments = ["guitar", "bass_guitar", "keyboard", "drum", "synth", "classic_guitar", "piano", "trumpet", "sax", "violin", "cello", "organ"];
-  List<String> kInstName = ["일렉 기타", "베이스 기타", "키보드", "드럼", "신디사이저", "클래식 기타", "피아노", "트럼펫", "색소폰", "바이올린", "첼로", "오르간"];
+  List<String> instruments = ["guitar", "bass_guitar", "keyboard", "drum", "synth", "classic_guitar", "piano", "trumpet", "sax", "violin", "cello", "organ", "ETC"];
+  List<String> kInstName = ["일렉 기타", "베이스 기타", "키보드", "드럼", "신디사이저", "클래식 기타", "피아노", "트럼펫", "색소폰", "바이올린", "첼로", "오르간", "그 외"];
   List<String> kGenreName = ["팝", "알앤비", "랩", "재즈", "블루스", "일렉트로닉", "포크", "레게", "컨츄리", "뉴에이지", "라틴", "종교음악", "클래식", "동요" ];
   List<String> timeSignature = ["4/4", "2/4", "3/4", "1/4", "6/8", "3/8", "other tempos"];
   List<String> bpms = ["천천히(<=76BPM)", "보통 빠르기로(76-120BPM)", "빠르게(>=120BPM)"];
@@ -102,7 +102,7 @@ class _AiComposeState extends State<AiCompose> {
 
   Map<String, dynamic> optionsToJson() {
     var insts = [];
-    for (int i = 0; i<instruments.length; i++) {
+    for (int i = 0; i<selectedInst.length; i++) {
       if(selectedInst[i]) {
         insts.add(instruments[i]);
       }
@@ -547,7 +547,7 @@ class _AiComposeState extends State<AiCompose> {
         child: ListView.builder(
             shrinkWrap: true,
             scrollDirection: Axis.horizontal,
-            itemCount: instruments.length~/2,
+            itemCount: instruments.length~/2-1,
             itemBuilder: (context, ind) {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 8.0, right: 8.0),

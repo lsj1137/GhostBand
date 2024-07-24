@@ -118,6 +118,17 @@ double composeQuestionGap(BuildContext context) {
   }
 }
 
+
+double scorePageGap(BuildContext context) {
+  double height = MediaQuery.of(context).size.height;
+  if (height > 1000){
+    return 19;
+  } else {
+    return 5.5;
+  }
+}
+
+
 BoxDecoration gbBox (double opacity, {double boxSize = -1}) {
   return BoxDecoration(
     color: const Color(0xFFFFFFFF).withOpacity(opacity),
