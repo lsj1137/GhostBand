@@ -96,7 +96,7 @@ class MainDrawer extends StatelessWidget {
       children: [
         Text("AI 작곡 기능", style: semiBold(fontSize2(context))),
         SizedBox(height: screenHeight*0.02),
-        Text("AI 작곡 모델 MuseCoco을 이용해 사용자가 원하는 스타일의 곡을 작곡합니다.", style: normal(fontSize3(context))),
+        Text("AI 작곡 모델 MuseCoco를 이용해 사용자가 원하는 스타일의 곡을 작곡합니다.", style: normal(fontSize3(context))),
         Text("사용자는 장르, 리듬, 사용될 악기를 선택할 수 있습니다.", style: normal(fontSize3(context))),
         Text("음원 하나(midi)와 그에 대한 악보(pdf)가 생성되며, 시간은 8~15분 정도가 소요됩니다.", style: normal(fontSize3(context))),
         Text("생성이 다 되면 다이얼로그를 통해 알려드리며, 생성 중간에 취소도 가능합니다.", style: normal(fontSize3(context))),
