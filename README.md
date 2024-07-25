@@ -1,18 +1,22 @@
-들어가기에 앞서, 본 프로젝트는 \<SW중심대학 디지털 경진대회_SW와 생성AI의 만남 : SW 부문\> 출품작임을 알려드립니다.
+들어가기에 앞서, 본 프로젝트는 **\<SW중심대학 디지털 경진대회_SW와 생성AI의 만남 : SW 부문\>** 출품작임을 알려드립니다.
 
 # Ghost Band
-안녕하세요, 저희는 단국대학교 컴퓨터공학과에 재학중인 학생들로 구성된 \<단컴한 인생\> 팀입니다.
+안녕하세요, 저희는 단국대학교 컴퓨터공학과에 재학중인 학생들로 구성된 **\<단컴한 인생\>** 팀입니다.
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
 <table>
   <tr>
-    <td align="center"><a href="https://github.com/WaRoong2"><img src="https://avatars.githubusercontent.com/u/57708892?v=44" width="100px;" alt=""/><br /><sub><b>SeJun Lim</b></sub></a><br />
+    <td align="center"><a href="https://github.com/lsj1137"><img src="https://avatars.githubusercontent.com/u/57708892?v=44" width="100px;" alt=""/><br /><sub><b>SeJun Lim</b></sub></a><br />
     <td align="center"><a href="https://github.com/Asimofe"><img src="https://avatars.githubusercontent.com/u/44723052?v=4" width="100px;" alt=""/><br /><sub><b>CheolMin Lee</b></sub></a><br />
     <td align="center"><a href="https://github.com/Mkpong"><img src="https://avatars.githubusercontent.com/u/107354104?v=4" width="100px;" alt=""/><br /><sub><b>JaeYoung Lee</b></sub></a><br />
-</table>  
+</table>
 
-그럼 "혼자서도 밴드 활동을 즐길 수 있는 방법이 없을까?"에서 출발한 프로젝트, \<Ghost Band\>를 소개합니다.
+그럼 "혼자서도 밴드 활동을 즐길 수 있는 방법이 없을까?"에서 출발한 프로젝트, \<**Ghost Band**\>를 소개합니다.
+
+본 프로젝트의 AI기능 코드는 아래의 링크에서 확인하실 수 있습니다.
+
+- [GhostBand-AI-Composition](https://github.com/Asimofe/GhostBand-AI-Composition)
 
 ## 목차
 - [Ghost Band](#ghost-band)
@@ -22,8 +26,8 @@
       - [Android](#android)
       - [ios](#ios)
   - [실행 화면](#실행-화면)
-  - [외부 링크](#외부-링크)
   - [발표 자료](#발표-자료)
+  - [연락처](#연락처)
 
 ## 개요
 ### 앱 소개
@@ -33,7 +37,10 @@ Ghost Band는 혼자서도 밴드 활동을 즐길 수 있게끔 **AI 작곡**, 
 제작 기간은 2024.06.20 ~ 2024.07.18로 약 한 달입니다.
 
 ### 제작 동기
-
+저희는 모두 밴드 악기를 배워본 경험이 있습니다.\
+밴드 악기를 배울 때 자연스레 "밴드에 참여하고 싶다!"라는 감정을 느끼고,\
+주변에 밴드 활동을 하는 친구들로부터 합주 활동 펑크가 났던 이야기들을 들으면서,\
+대신
 
 ## 실행 가이드
 본 어플리케이션은 Galaxy Tab S8+의 화면 크기에 최적화되었습니다.\
@@ -41,9 +48,6 @@ Ghost Band는 혼자서도 밴드 활동을 즐길 수 있게끔 **AI 작곡**, 
 감안하여 사용해주시면 감사하겠습니다.
 
 ### Android
-<details>
-  <summary> 펼치기 </summary>
-  
 1. 실행하고자 하는 기기에서 다음 링크에 접속해 .apk 파일을 다운로드합니다.\
 링크(#)
 2. 다운로드된 apk 파일을 실행합니다.\
@@ -60,8 +64,6 @@ Ghost Band는 혼자서도 밴드 활동을 즐길 수 있게끔 **AI 작곡**, 
 ![KakaoTalk_Photo_2024-07-25-21-08-23 001](https://github.com/user-attachments/assets/8368a2d8-8860-4289-9457-3a20d3adca2f)\
 3. "열기"를 눌러 실행하거나 "완료"를 누른 후 메뉴에 생긴 아이콘을 눌러 앱을 실행합니다.\
 ![KakaoTalk_Photo_2024-07-25-21-16-03](https://github.com/user-attachments/assets/50ef035e-120e-4788-8704-b09414a1d4fd)
-  
-</details>
 
 
 ### ios
@@ -111,5 +113,10 @@ Ghost Band에 사용된 AI 서버 코드를 볼 수 있는 링크입니다.
 ![15 Reference](https://github.com/user-attachments/assets/890fd62d-fe2c-4362-ac9d-6d88cd955b0a)
 
 </details>
+
+## 연락처
+기타 문의사항이 있다면 아래의 E-mail을 통해 연락해주세요.  
+- 작성자: 임세준  
+- E-mail: lsj1137@naver.com
 
 
