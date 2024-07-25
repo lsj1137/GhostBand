@@ -1,6 +1,6 @@
 들어가기에 앞서, 본 프로젝트는 \<SW중심대학 디지털 경진대회_SW와 생성AI의 만남 : SW 부문\> 출품작임을 알려드립니다.
 
-# Ghost Band : 혼자서도 즐기는 밴드 활동
+# Ghost Band
 안녕하세요, 저희는 단국대학교 컴퓨터공학과에 재학중인 학생들로 구성된 \<단컴한 인생\> 팀입니다.
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
