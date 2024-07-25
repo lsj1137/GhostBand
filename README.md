@@ -12,7 +12,7 @@
     <td align="center"><a href="https://github.com/Mkpong"><img src="https://avatars.githubusercontent.com/u/107354104?v=4" width="100px;" alt=""/><br /><sub><b>JaeYoung Lee</b></sub></a><br />
 </table>
 
-그럼 "혼자서도 밴드 활동을 즐길 수 있는 방법이 없을까?"에서 출발한 프로젝트, \<**Ghost Band**\>를 소개합니다.
+이제 그럼, "혼자서도 밴드 활동을 즐길 수 있는 방법이 없을까?"에서 출발한 프로젝트, \<**Ghost Band**\>를 소개합니다.
 
 본 프로젝트의 AI기능 코드는 아래의 링크에서 확인하실 수 있습니다.
 
