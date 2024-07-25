@@ -74,9 +74,9 @@ Ghost Band는 혼자서도 밴드 활동을 즐길 수 있게끔 **AI 작곡**, 
 ## 실행 화면
 ### 메인 화면
 ![KakaoTalk_20240724_222152937](https://github.com/user-attachments/assets/1217edd2-0e19-483e-8329-b48aeddbd57b)
-### AI 작곡 화면-장르 선택
+### AI 작곡 화면 - 장르 선택
 ![KakaoTalk_20240724_222152937_02](https://github.com/user-attachments/assets/19dc9687-a146-4671-b578-58148be58bda)
-### AI 작곡 화면-악기 선택
+### AI 작곡 화면 - 악기 선택
 ![KakaoTalk_20240724_222152937_03](https://github.com/user-attachments/assets/f6c7f995-c560-4473-80ca-4ba9d961d918)
 ### 음악 생성중 화면
 ![KakaoTalk_20240724_222152937_04](https://github.com/user-attachments/assets/ca781230-b361-43fa-8a24-0b6aabd8f6ab)
@@ -84,19 +84,21 @@ Ghost Band는 혼자서도 밴드 활동을 즐길 수 있게끔 **AI 작곡**, 
 ![KakaoTalk_20240724_222152937_05](https://github.com/user-attachments/assets/96b6eeec-fe04-4ee3-a477-c8ded8cf2687)
 ### 생성 완료 다이얼로그
 ![KakaoTalk_20240724_222152937_06](https://github.com/user-attachments/assets/556a182a-e3ee-42f0-9cff-5de17820c2bd)
-### AI 작곡 화면
+### 악보 추출 - 분석전
 ![KakaoTalk_20240724_222152937_07](https://github.com/user-attachments/assets/62a81fbd-dffb-4cfd-a6dd-8196a0048f49)
-### AI 작곡 화면
+### 악보 추출 - 분석후
+![KakaoTalk_20240724_225915773](https://github.com/user-attachments/assets/f6f32f47-183d-4a50-be9e-1c15d7c5eae6)
+### 악기 소리 뮤트 - 분석전
 ![KakaoTalk_20240724_222152937_08](https://github.com/user-attachments/assets/28b1eaf1-3350-4f12-ae9c-19a7b8830b5c)
-### AI 작곡 화면
-![KakaoTalk_20240724_222152937_09](https://github.com/user-attachments/assets/b1ed7344-656a-4250-bfe0-8fbfd3aa2dc5)
-### AI 작곡 화면
-![KakaoTalk_20240724_222152937_10](https://github.com/user-attachments/assets/a58aedcc-f901-4f9a-a94b-2e26fbab9844)
-### AI 작곡 화면
+### 악기 소리 뮤트 - 진행중
 ![KakaoTalk_20240724_222152937_11](https://github.com/user-attachments/assets/6fd7b63b-0576-4eae-b124-7f0cefa5f616)
-### AI 작곡 화면
+### 악기 소리 뮤트 - 분석후
 ![KakaoTalk_20240724_222152937_12](https://github.com/user-attachments/assets/d82962b3-949f-4bae-88c3-f9e96813c476)
-### AI 작곡 화면
+### 악보 확인/재생 화면
+![KakaoTalk_20240724_222152937_09](https://github.com/user-attachments/assets/b1ed7344-656a-4250-bfe0-8fbfd3aa2dc5)
+### 악보 상세 화면
+![KakaoTalk_20240724_222152937_10](https://github.com/user-attachments/assets/a58aedcc-f901-4f9a-a94b-2e26fbab9844)
+### 메인 화면 - 햄버거 메뉴
 ![KakaoTalk_20240724_222152937_01](https://github.com/user-attachments/assets/db60ffb1-ec0c-4439-b305-2bb26334b7aa)
 
 
