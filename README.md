@@ -65,17 +65,12 @@ Ghost Band는 혼자서도 밴드 활동을 즐길 수 있게끔 **AI 작곡**, 
 3. "열기"를 눌러 실행하거나 "완료"를 누른 후 메뉴에 생긴 아이콘을 눌러 앱을 실행합니다.\
 ![KakaoTalk_Photo_2024-07-25-21-16-03](https://github.com/user-attachments/assets/50ef035e-120e-4788-8704-b09414a1d4fd)
 
-
 ### ios
 추후 업데이트 예정
 
 
 ## 실행 화면
 
-## 외부 링크
-### GhostBand-AI-Composition
-[GhostBand-AI-Composition](https://github.com/Asimofe/GhostBand-AI-Composition)\
-Ghost Band에 사용된 AI 서버 코드를 볼 수 있는 링크입니다.
 
 ## 발표 자료
 <details>
